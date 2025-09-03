@@ -1,0 +1,8 @@
+@import "tailwindcss";
+
+@utility card {
+  @apply p-2 rounded-lg bg-white shadow-gray-300 shadow-[0_0_4px];
+}
+@utility overview-card {
+  @apply p-2 py-4 flex-grow rounded-lg bg-white shadow-gray-300 shadow-[0_0_4px];
+}
