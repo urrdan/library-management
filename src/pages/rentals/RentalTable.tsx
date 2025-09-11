@@ -1,14 +1,7 @@
-import { useState } from "react";
 import DataTable from "react-data-table-component";
 import { MdMenu } from "react-icons/md";
-import MyModal from "../components/MyModal";
-import { CgCloseO } from "react-icons/cg";
-import MyInput from "../components/MyInput";
-import MyButton from "../components/MyButton";
-
-export default function Books() {
-  const [openModal, setOpenModal] = useState(true);
-
+import MyButton from "../../components/MyButton";
+export default function RentalTable() {
   const columns = [
     {
       name: "First name",
@@ -32,13 +25,12 @@ export default function Books() {
     },
     {
       name: "Actions",
-      selector: () => {
+      cell: () => {
         return (
-          <MdMenu
-            onClick={() => {
-              setOpenModal(!openModal);
-            }}
-          />
+          <div>
+            <MyButton title="Return" className="mr-1" sm />
+            <MyButton title="Cancel" sm />
+          </div>
         );
       },
       sortable: true,
@@ -60,7 +52,7 @@ export default function Books() {
   ];
 
   return (
-    <div style={{ height: 300, width: "100%" }}>
+    <div>
       <DataTable
         data={rows}
         columns={columns}
@@ -68,31 +60,6 @@ export default function Books() {
         paginationPerPage={10}
         paginationRowsPerPageOptions={[5, 10, 50, 100]}
       />
-      {openModal && (
-        <MyModal
-          onClose={() => {
-            setOpenModal(false);
-          }}
-        >
-          <div className="flex justify-between">
-            <div>New Form</div>{" "}
-            <CgCloseO
-              onClick={() => {
-                setOpenModal(false);
-              }}
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <MyInput type={"number"} label="First Name" />
-            <MyInput type={"number"} label="First Name" />
-            <MyInput type={"number"} label="First Name" />
-            <MyInput type={"number"} label="First Name" />
-          </div>
-          <div className="m-4">
-            <MyButton title={"click"} />
-          </div>
-        </MyModal>
-      )}
     </div>
   );
 }
