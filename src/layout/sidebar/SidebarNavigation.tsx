@@ -3,10 +3,9 @@ import { NavLink } from "react-router-dom";
 export default function SidebarNavigation() {
   const data = [
     { label: "Overview", path: "/" },
-    { label: "Dashboard", path: "/" },
     { label: "Rentals", path: "/rentals" },
     { label: "Books", path: "/books" },
-    { label: "Customers", path: "/" },
+    { label: "Customers", path: "/customers" },
     { label: "Staff", path: "/" },
   ];
   return (

@@ -1,28 +1,38 @@
 import DataTable from "react-data-table-component";
-import { MdMenu } from "react-icons/md";
 import MyButton from "../../components/MyButton";
+import { rentalData } from "../../apis/data/rentalData";
 export default function RentalTable() {
   const columns = [
     {
-      name: "First name",
-      selector: (row: any) => row.firstName,
+      name: "Book Title",
+      selector: (row: any) => row.bookTitle,
       sortable: true,
     },
     {
-      name: "Last name",
-      selector: (row: any) => row.firstName,
+      name: "Customer Name",
+      selector: (row: any) => row.customerFirstName,
       sortable: true,
     },
     {
-      name: "Age",
-      selector: (row: any) => row.age,
+      name: "Rented Date",
+      selector: (row: any) => row.rentedDate,
       sortable: true,
     },
     {
+      name: "Return Date",
+      selector: (row: any) => row.returnDate,
+      sortable: true,
+    },
+    {
+      name: "Status",
+      selector: (row: any) => <div>{row.returnDate && "Overdue"}</div>,
+      sortable: true,
+    },
+    /* {
       name: "Full name",
       selector: (row: any) => `${row.firstName || ""} ${row.lastName || ""}`,
       sortable: true,
-    },
+    }, */
     {
       name: "Actions",
       cell: () => {
@@ -54,7 +64,7 @@ export default function RentalTable() {
   return (
     <div>
       <DataTable
-        data={rows}
+        data={rentalData}
         columns={columns}
         pagination
         paginationPerPage={10}

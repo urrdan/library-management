@@ -5,7 +5,7 @@ import RentalForm from "./modals/RentalForm";
 import MyModal from "../../components/MyModal";
 
 export default function Rentals() {
-  const [newRentalOpen, setNewRentalOpen] = useState(false);
+  const [newRentalOpen, setNewRentalOpen] = useState(true);
 
   return (
     <div>

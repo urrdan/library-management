@@ -11,7 +11,7 @@ export default function MyModal({ children, onClose }: Props) {
       onClick={onClose}
     >
       <div
-        className="relative bg-white rounded max-h-full max-w-full overflow-auto"
+        className="relative bg-white rounded-lg max-h-full max-w-full overflow-auto"
         onClick={(e) => {
           e.stopPropagation();
         }}
@@ -28,7 +28,7 @@ export function MyModalHead({
   children: JSX.Element | JSX.Element[] | string;
 }) {
   return (
-    <div className="border-1 p-4 py-1 sticky top-0 bg-white  flex justify-between items-center">
+    <div className="z-3 p-4 py-2 sticky top-0 shadow-[0_0_4px_gray] bg-white  flex justify-between items-center ">
       {children}
     </div>
   );
@@ -39,5 +39,5 @@ export function MyModalBody({
 }: {
   children: JSX.Element | JSX.Element[] | string;
 }) {
-  return <div className="p-4">{children}</div>;
+  return <div className="p-5 pb-15">{children}</div>;
 }
