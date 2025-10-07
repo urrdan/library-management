@@ -3,9 +3,12 @@ import RentalTable from "./RentalTable";
 import MyButton from "../../components/MyButton";
 import RentalForm from "./modals/RentalForm";
 import MyModal from "../../components/MyModal";
+//import { mainContext } from "../MainContext";
+import { rentalData as rentals } from "../../apis/data/rentalData";
 
 export default function Rentals() {
-  const [newRentalOpen, setNewRentalOpen] = useState(true);
+  //const { rentals } = useContext(mainContext);
+  const [newRentalOpen, setNewRentalOpen] = useState(false);
 
   return (
     <div>
@@ -17,7 +20,7 @@ export default function Rentals() {
           }}
         />
       </div>
-      <RentalTable />
+      <RentalTable rentals={rentals} />
       {newRentalOpen && (
         <MyModal
           onClose={() => {

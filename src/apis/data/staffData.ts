@@ -1,7 +1,6 @@
-interface staffDataType {
+export interface staffDataType {
   staffId: number;
-  firstName: string;
-  lastName: string;
+  staffName: string;
   email: string;
   phone: string;
   staffSince: string;
@@ -9,16 +8,14 @@ interface staffDataType {
 export const staffData: staffDataType[] = [
   {
     staffId: 1,
-    firstName: "John",
-    lastName: "Doe",
+    staffName: "John Doe",
     email: "Johndoe@gmail.com",
     phone: "6231234456",
     staffSince: "23-12-2023",
   },
   {
     staffId: 2,
-    firstName: "Michael",
-    lastName: "Brown",
+    staffName: "Michael Brown",
     phone: "6231234456",
     email: "Johndoe@gmail.com",
     staffSince: "23-12-2023",

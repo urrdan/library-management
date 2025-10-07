@@ -22,6 +22,7 @@ export default function RentalForm({ onClose }: { onClose: () => void }) {
 
     setData({ ...data, ...modifiedData });
   };
+
   return (
     <>
       <MyModalHead>
@@ -46,8 +47,11 @@ export default function RentalForm({ onClose }: { onClose: () => void }) {
             value={data.customerName}
             onSelect={(selectedCustomer) => {
               onChange([
-                { propName: "customerName", value: selectedCustomer.name },
-                { propName: "customerId", value: selectedCustomer.id },
+                {
+                  propName: "customerName",
+                  value: selectedCustomer.customerName,
+                },
+                { propName: "customerId", value: selectedCustomer.customerId },
               ]);
             }}
           />
@@ -55,8 +59,8 @@ export default function RentalForm({ onClose }: { onClose: () => void }) {
             value={data.bookTitle}
             onSelect={(selectedBook) => {
               onChange([
-                { propName: "bookTitle", value: selectedBook.name },
-                { propName: "bookId", value: selectedBook.id },
+                { propName: "bookTitle", value: selectedBook.title },
+                { propName: "bookId", value: selectedBook.bookId },
               ]);
             }}
           />
@@ -64,8 +68,8 @@ export default function RentalForm({ onClose }: { onClose: () => void }) {
             value={data.staffName}
             onSelect={(selectedStaff) => {
               onChange([
-                { propName: "staffName", value: selectedStaff.name },
-                { propName: "staffId", value: selectedStaff.id },
+                { propName: "staffName", value: selectedStaff.staffName },
+                { propName: "staffId", value: selectedStaff.staffId },
               ]);
             }}
           />

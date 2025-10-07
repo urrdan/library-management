@@ -1,7 +1,11 @@
 import DataTable from "react-data-table-component";
 import MyButton from "../../components/MyButton";
-import { rentalData } from "../../apis/data/rentalData";
-export default function RentalTable() {
+import type { rentalDataType } from "../../apis/data/rentalData";
+export default function RentalTable({
+  rentals,
+}: {
+  rentals: rentalDataType[];
+}) {
   const columns = [
     {
       name: "Book Title",
@@ -10,7 +14,7 @@ export default function RentalTable() {
     },
     {
       name: "Customer Name",
-      selector: (row: any) => row.customerFirstName,
+      selector: (row: any) => row.customerName,
       sortable: true,
     },
     {
@@ -47,24 +51,10 @@ export default function RentalTable() {
     },
   ];
 
-  const rows = [
-    { id: 1, lastName: "Snow", firstName: "Jon", age: 14 },
-    { id: 2, lastName: "Lannister", firstName: "Cersei", age: 31 },
-    { id: 3, lastName: "Lannister", firstName: "Jaime", age: 31 },
-    { id: 4, lastName: "Stark", firstName: "Arya", age: 11 },
-    { id: 5, lastName: "Targaryen", firstName: "Daenerys", age: null },
-    { id: 6, lastName: "Melisandre", firstName: null, age: 150 },
-    { id: 7, lastName: "Clifford", firstName: "Ferrara", age: 44 },
-    { id: 8, lastName: "Frances", firstName: "Rossini", age: 36 },
-    { id: 9, lastName: "Roxie", firstName: "Harvey", age: 65 },
-    { id: 10, lastName: "Roxie", firstName: "Harvey", age: 65 },
-    { id: 11, lastName: "Roxie", firstName: "Harvey", age: 65 },
-  ];
-
   return (
     <div>
       <DataTable
-        data={rentalData}
+        data={rentals}
         columns={columns}
         pagination
         paginationPerPage={10}

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import MySearchInput from "./MySearchInput";
+import { staffData, type staffDataType } from "../../apis/data/staffData";
 
 export default function StaffSearcher({
   value,
@@ -7,22 +8,17 @@ export default function StaffSearcher({
   label = "Staff",
 }: {
   value: string;
-  onSelect: (selectedStaff: { id: number; name: string }) => void;
+  onSelect: (selectedStaff: staffDataType) => void;
   label?: string;
 }) {
-  const [searchResult, setSearchResult] = useState<any[]>([]);
-  const result = [
-    { id: 2, name: "Alex Jones" },
-    { id: 3, name: "Jesicca Brown" },
-    { id: 4, name: "John Jackson" },
-    { id: 5, name: "Haifa Manroe" },
-  ];
+  const [searchResult, setSearchResult] = useState<staffDataType[]>([]);
+
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
-    let filteredResult: { id: number; name: string }[] = [];
+    let filteredResult: staffDataType[] = [];
     if (value)
-      filteredResult = result.filter((x) =>
-        x.name.toLocaleLowerCase().includes(value)
+      filteredResult = staffData.filter((x) =>
+        x.staffName.toLocaleLowerCase().includes(value)
       );
 
     setSearchResult(filteredResult);
@@ -39,7 +35,7 @@ export default function StaffSearcher({
             }}
             className="px-2 my-2 link-like"
           >
-            {item.name}
+            {item.staffName}
           </div>
         ))}
       </>

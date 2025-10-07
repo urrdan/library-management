@@ -1,5 +1,6 @@
 import { useState } from "react";
 import MySearchInput from "./MySearchInput";
+import { booksData, type bookDataType } from "../../apis/data/booksData";
 
 export default function BookSearcher({
   value,
@@ -7,27 +8,17 @@ export default function BookSearcher({
   label = "Book",
 }: {
   value: string;
-  onSelect: (selectedBook: { id: number; name: string }) => void;
+  onSelect: (selectedBook: bookDataType) => void;
   label?: string;
 }) {
-  const [searchResult, setSearchResult] = useState<any[]>([]);
-  const result = [
-    { id: 2, name: "The Firm", inStore: 9, totalCopies: 12 },
-    { id: 3, name: "The Witch And Twelve Slaves", inStore: 7, totalCopies: 8 },
-    { id: 4, name: "A Narrow Escape", inStore: 3, totalCopies: 6 },
-    { id: 5, name: "Marie Has A Secrete", inStore: 11, totalCopies: 16 },
-  ];
+  const [searchResult, setSearchResult] = useState<bookDataType[]>([]);
+
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
-    let filteredResult: {
-      id: number;
-      name: string;
-      inStore: number;
-      totalCopies: number;
-    }[] = [];
+    let filteredResult: bookDataType[] = [];
     if (value)
-      filteredResult = result.filter((x) =>
-        x.name.toLocaleLowerCase().includes(value)
+      filteredResult = booksData.filter((x) =>
+        x.title.toLocaleLowerCase().includes(value)
       );
 
     setSearchResult(filteredResult);
@@ -44,7 +35,7 @@ export default function BookSearcher({
             }}
             className="px-2 my-2 link-like"
           >
-            <div>{item.name}</div>
+            <div>{item.title}</div>
             <div className="text-gray-500 flex justify-end">
               Instore: {item.inStore}/{item.totalCopies}
             </div>

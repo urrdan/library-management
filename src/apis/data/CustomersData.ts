@@ -1,7 +1,6 @@
-interface customerDataType {
+export interface customerDataType {
   customerId: number;
-  firstName: string;
-  lastName: string;
+  customerName: string;
   email: string;
   phone: string;
   customerSince: string;
@@ -11,8 +10,7 @@ export const membershipStatus = ["Active", "Inactive", "Suspended"];
 export const customersData: customerDataType[] = [
   {
     customerId: 1,
-    firstName: "John",
-    lastName: "Doe",
+    customerName: "John Doe",
     phone: "6231234456",
     customerSince: "23-12-2023",
     email: "Johndoe@gmail.com",
@@ -20,8 +18,7 @@ export const customersData: customerDataType[] = [
   },
   {
     customerId: 2,
-    firstName: "Michael",
-    lastName: "Brown",
+    customerName: "Michael Brown",
     phone: "6231234456",
     customerSince: "23-12-2023",
     email: "Johndoe@gmail.com",

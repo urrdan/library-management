@@ -1,5 +1,9 @@
 import { useState } from "react";
 import MySearchInput from "./MySearchInput";
+import {
+  customersData,
+  type customerDataType,
+} from "../../apis/data/CustomersData";
 
 export default function CustomerSearcher({
   value,
@@ -7,22 +11,17 @@ export default function CustomerSearcher({
   label = "Customer",
 }: {
   value: string;
-  onSelect: (selectedCustomer: { id: number; name: string }) => void;
+  onSelect: (selectedCustomer: customerDataType) => void;
   label?: string;
 }) {
-  const [searchResult, setSearchResult] = useState<any[]>([]);
-  const result = [
-    { id: 2, name: "hello" },
-    { id: 3, name: "bye" },
-    { id: 4, name: "Ulama" },
-    { id: 5, name: "chafi" },
-  ];
+  const [searchResult, setSearchResult] = useState<customerDataType[]>([]);
+
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
-    let filteredResult: { id: number; name: string }[] = [];
+    let filteredResult: customerDataType[] = [];
     if (value)
-      filteredResult = result.filter((x) =>
-        x.name.toLocaleLowerCase().includes(value)
+      filteredResult = customersData.filter((x) =>
+        x.customerName.toLocaleLowerCase().includes(value)
       );
 
     setSearchResult(filteredResult);
@@ -39,7 +38,7 @@ export default function CustomerSearcher({
             }}
             className="px-2 my-2 link-like"
           >
-            {item.name}
+            {item.customerName}
           </div>
         ))}
       </>
