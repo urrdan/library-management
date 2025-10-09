@@ -1,14 +1,24 @@
 export interface rentalDataType {
-  rentalId: number;
-  bookId: number;
+  rentalId?: number;
+  bookId: number | null;
   bookTitle: string;
-  customerId: number;
+  customerId: number | null;
   customerName: string;
-  staffId: number;
+  staffId: number | null;
   staffName: string;
   rentedDate: string;
   returnDate: string;
 }
+export const rentalDataTemplate = {
+  bookId: null,
+  bookTitle: "",
+  customerId: null,
+  customerName: "",
+  staffId: null,
+  staffName: "",
+  rentedDate: "",
+  returnDate: "",
+};
 export const rentalData: rentalDataType[] = [
   {
     rentalId: 11,
@@ -18,8 +28,8 @@ export const rentalData: rentalDataType[] = [
     customerName: "John Doe",
     staffId: 1,
     staffName: "John Doe",
-    rentedDate: "25-09-2025",
-    returnDate: "6-10-2025",
+    rentedDate: "2025-09-25",
+    returnDate: "2025-10-06",
   },
   {
     rentalId: 13,
@@ -29,7 +39,7 @@ export const rentalData: rentalDataType[] = [
     customerName: "Michael Brown",
     staffId: 2,
     staffName: "Michael Brown",
-    rentedDate: "29-09-2025",
-    returnDate: "14-10-2025",
+    rentedDate: "2025-09-29",
+    returnDate: "2025-10-14",
   },
 ];

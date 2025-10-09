@@ -4,12 +4,25 @@ import MyInput from "../../../components/MyInput";
 import { MyModalBody, MyModalHead } from "../../../components/MyModal";
 import MySelectInput from "../../../components/MySelectInput";
 import CustomerSearcher from "../../../components/searchers/CustomersSearcher";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import BookSearcher from "../../../components/searchers/BookSearcher";
 import StaffSearcher from "../../../components/searchers/StaffSearcher";
+import { mainContext } from "../../MainContext";
+import type { rentalDataType } from "../../../apis/data/rentalData";
 
-export default function RentalForm({ onClose }: { onClose: () => void }) {
-  const [data, setData] = useState<{ [key: string]: any }>({});
+export default function RentalForm({
+  data,
+  isEditing,
+  onClose,
+}: {
+  data: rentalDataType;
+  isEditing?: boolean;
+  onClose: () => void;
+}) {
+  const { apis } = useContext(mainContext);
+
+  const [stateData, setStateData] = useState<rentalDataType>(data);
+
   const onChange = (
     dataToBeModified: { value: string | number; propName: string }[]
   ) => {
@@ -18,20 +31,23 @@ export default function RentalForm({ onClose }: { onClose: () => void }) {
       modifiedData[c.propName] = c.value;
     });
 
-    console.log(modifiedData);
-
-    setData({ ...data, ...modifiedData });
+    setStateData({ ...stateData, ...modifiedData });
   };
 
   return (
     <>
       <MyModalHead>
-        <div></div>
+        <div>
+          <h4>{isEditing ? "Edit Rental Info" : "Create New Rental"}</h4>
+        </div>
         <div className="flex">
           <MyButton
             title="Save"
             onClick={() => {
-              console.log(data);
+              console.log(stateData);
+              const method = isEditing ? "update" : "post";
+              apis("rental", method, stateData);
+              onClose();
             }}
           />
           <MdClose
@@ -44,19 +60,23 @@ export default function RentalForm({ onClose }: { onClose: () => void }) {
       <MyModalBody>
         <div className="grid grid-cols-2 gap-4 gap-x-6">
           <CustomerSearcher
-            value={data.customerName}
+            value={stateData.customerName}
             onSelect={(selectedCustomer) => {
               onChange([
                 {
                   propName: "customerName",
                   value: selectedCustomer.customerName,
                 },
-                { propName: "customerId", value: selectedCustomer.customerId },
+                {
+                  propName: "customerId",
+                  value: selectedCustomer.customerId,
+                },
               ]);
             }}
           />
+
           <BookSearcher
-            value={data.bookTitle}
+            value={stateData.bookTitle}
             onSelect={(selectedBook) => {
               onChange([
                 { propName: "bookTitle", value: selectedBook.title },
@@ -65,7 +85,7 @@ export default function RentalForm({ onClose }: { onClose: () => void }) {
             }}
           />
           <StaffSearcher
-            value={data.staffName}
+            value={stateData.staffName}
             onSelect={(selectedStaff) => {
               onChange([
                 { propName: "staffName", value: selectedStaff.staffName },
@@ -73,22 +93,17 @@ export default function RentalForm({ onClose }: { onClose: () => void }) {
               ]);
             }}
           />
-          <MySelectInput
-            label="Genre"
-            options={["Crime", "Thriller", "Romance", "Children"]}
-            onChange={(value) =>
-              onChange([{ value: value, propName: "genre" }])
-            }
-          />
 
           <MyInput
             label="Rented Date"
             type="date"
+            value={stateData.rentedDate}
             onChange={(e) => onChange([{ propName: "rentedDate", value: e }])}
           />
           <MyInput
             label="Return Date"
             type="date"
+            value={stateData.returnDate}
             onChange={(e) => onChange([{ propName: "returnDate", value: e }])}
           />
         </div>

@@ -1,14 +1,20 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import RentalTable from "./RentalTable";
 import MyButton from "../../components/MyButton";
 import RentalForm from "./modals/RentalForm";
 import MyModal from "../../components/MyModal";
-//import { mainContext } from "../MainContext";
-import { rentalData as rentals } from "../../apis/data/rentalData";
+import { mainContext } from "../MainContext";
+import {
+  rentalDataTemplate,
+  type rentalDataType,
+} from "../../apis/data/rentalData";
 
 export default function Rentals() {
-  //const { rentals } = useContext(mainContext);
-  const [newRentalOpen, setNewRentalOpen] = useState(false);
+  const { rentals } = useContext(mainContext);
+  const [openNewRental, setOpenNewRental] = useState(false);
+  const [openEditRental, setOpenEditRental] = useState(false);
+  const [editingData, setEditingData] =
+    useState<rentalDataType>(rentalDataTemplate);
 
   return (
     <div>
@@ -16,18 +22,43 @@ export default function Rentals() {
         <MyButton
           title="New Rental"
           onClick={() => {
-            setNewRentalOpen(true);
+            setOpenNewRental(true);
           }}
         />
       </div>
-      <RentalTable rentals={rentals} />
-      {newRentalOpen && (
+      <RentalTable
+        rentals={rentals}
+        onEditing={(record) => {
+          setEditingData(record);
+          setOpenEditRental(true);
+        }}
+      />
+      {openNewRental && (
         <MyModal
           onClose={() => {
-            setNewRentalOpen(false);
+            setOpenNewRental(false);
           }}
         >
-          <RentalForm onClose={() => setNewRentalOpen(false)} />
+          <RentalForm
+            onClose={() => setOpenNewRental(false)}
+            data={rentalDataTemplate}
+          />
+        </MyModal>
+      )}
+      {openEditRental && (
+        <MyModal
+          onClose={() => {
+            setOpenEditRental(false);
+          }}
+        >
+          <RentalForm
+            onClose={() => {
+              setOpenEditRental(false);
+              setEditingData(rentalDataTemplate);
+            }}
+            data={editingData}
+            isEditing
+          />
         </MyModal>
       )}
     </div>
