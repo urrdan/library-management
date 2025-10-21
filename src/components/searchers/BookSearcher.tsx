@@ -6,13 +6,14 @@ export default function BookSearcher({
   value,
   onSelect,
   label = "Book",
+  error,
 }: {
   value: string;
   onSelect: (selectedBook: bookDataType) => void;
   label?: string;
+  error?: boolean;
 }) {
   const [searchResult, setSearchResult] = useState<bookDataType[]>([]);
-
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
     let filteredResult: bookDataType[] = [];
@@ -51,6 +52,7 @@ export default function BookSearcher({
       onChange={onChange}
       resultStructure={resultStructure}
       value={value}
+      error={error}
     />
   );
 }

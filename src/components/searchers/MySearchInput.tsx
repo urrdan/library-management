@@ -3,6 +3,7 @@ import { BiSearch } from "react-icons/bi";
 
 type props = {
   label?: string | undefined;
+  error?: boolean;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   //searchResult: any[];
   resultStructure: () => JSX.Element;
@@ -15,6 +16,7 @@ export default function MySearchInput({
   //searchResult,
   resultStructure,
   value,
+  error,
 }: props) {
   const [opened, setOpened] = useState(false);
   const [inputValue, setInputValue] = useState(value);
@@ -30,7 +32,12 @@ export default function MySearchInput({
   }, [value]);
   return (
     <div className="relative">
-      {label && <label className="block">{label}</label>}
+      <div>
+        {label && <label className="">{label}</label>}
+        {error && (
+          <span className="ml-1 text-red-500 text-lg font-bold">!</span>
+        )}
+      </div>
       <div className="flex items-center">
         <input
           type="search"
@@ -45,6 +52,9 @@ export default function MySearchInput({
         ></input>
         <BiSearch className="text-[30px] text-gray-400  p-1 border-1 rounded-lg rounded-l-none" />
       </div>
+      {error && (
+        <p className="text-red-500 italic text-sm">This field is required</p>
+      )}
       {opened ? (
         <div className=" w-full z-1  absolute overflow-y-scroll shadow-gray-400  shadow-[0_0_10px] bg-white max-h-40 rounded-lg">
           {resultStructure()}

@@ -9,10 +9,12 @@ export default function CustomerSearcher({
   value,
   onSelect,
   label = "Customer",
+  error,
 }: {
   value: string;
   onSelect: (selectedCustomer: customerDataType) => void;
   label?: string;
+  error?: boolean;
 }) {
   const [searchResult, setSearchResult] = useState<customerDataType[]>([]);
 
@@ -50,6 +52,7 @@ export default function CustomerSearcher({
       onChange={onChange}
       resultStructure={resultStructure}
       value={value}
+      error={error}
     />
   );
 }

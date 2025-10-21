@@ -6,10 +6,12 @@ export default function StaffSearcher({
   value,
   onSelect,
   label = "Staff",
+  error,
 }: {
   value: string;
   onSelect: (selectedStaff: staffDataType) => void;
   label?: string;
+  error?: boolean;
 }) {
   const [searchResult, setSearchResult] = useState<staffDataType[]>([]);
 
@@ -47,6 +49,7 @@ export default function StaffSearcher({
       onChange={onChange}
       resultStructure={resultStructure}
       value={value}
+      error={error}
     />
   );
 }
