@@ -8,9 +8,11 @@ import {
   rentalDataTemplate,
   type rentalDataType,
 } from "../../apis/data/rentalData";
+import { IoMdAdd } from "react-icons/io";
 
 export default function Rentals() {
   const { rentals } = useContext(mainContext);
+
   const [openNewRental, setOpenNewRental] = useState(false);
   const [openEditRental, setOpenEditRental] = useState(false);
   const [editingData, setEditingData] =
@@ -18,8 +20,10 @@ export default function Rentals() {
 
   return (
     <div>
-      <div className="mb-4">
+      <div className="mb-4 flex justify-between ">
+        <div></div>
         <MyButton
+          icon={<IoMdAdd />}
           title="New Rental"
           onClick={() => {
             setOpenNewRental(true);

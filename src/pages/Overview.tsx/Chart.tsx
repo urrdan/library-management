@@ -32,7 +32,7 @@ const Chart = () => {
           color: "#db7270",
         },
       ]}
-      xAxis={[{ scaleType: "point", data: xLabels }]}
+      xAxis={[{ scaleType: "point", data: xLabels, tickPlacement: "start" }]}
       /*  sx={{
           [`& .${lineElementClasses.root}`]: {
             display: "none",

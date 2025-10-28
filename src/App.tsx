@@ -3,6 +3,8 @@ import "./App.css";
 import MainDisplay from "./layout/MainDisplay";
 import Sidebar from "./layout/sidebar/Sidebar";
 import { MainContext } from "./pages/MainContext";
+import { RxAvatar } from "react-icons/rx";
+import { FiUploadCloud } from "react-icons/fi";
 
 function App() {
   const p = [];
@@ -12,12 +14,15 @@ function App() {
   return (
     <HashRouter>
       <MainContext>
-        <div className="h-full flex flex-grow overflow-hidden bg-gray-100 border-2 border-red-700">
+        <div className="h-full flex flex-grow overflow-hidden bg-gray-200 border-2 border-red-700">
           <Sidebar />
-          <div className="flex-grow flex flex-col  ">
-            <div className="p-2 flex justify-between ">
-              <input type="search" placeholder="Searchs" />
-              <div>&#11057;</div>
+          <div className="flex-grow flex flex-col">
+            <div className="p-2 px-4 flex justify-between bg-white">
+              <div></div>
+              <div className="flex gap-3 text-2xl">
+                <FiUploadCloud />
+                <RxAvatar />
+              </div>
             </div>
             <div className="p-4 flex-grow overflow-auto ">
               <MainDisplay />

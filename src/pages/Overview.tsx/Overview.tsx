@@ -7,7 +7,7 @@ const Overview = () => {
   return (
     <div className="p-4">
       <OverheadCards />
-      <div className="grid grid-cols-[2fr_1fr_1fr] h-75 gap-8">
+      <div className="grid grid-cols-[2fr_1fr] h-75 gap-8 mt-10">
         <div className="card">
           <Chart />
         </div>
