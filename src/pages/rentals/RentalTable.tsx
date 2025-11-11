@@ -1,18 +1,16 @@
 import DataTable from "react-data-table-component";
 import type { rentalDataType } from "../../apis/data/rentalData";
-import { mainContext } from "../MainContext";
-import { useContext } from "react";
 import { MdOutlineDeleteForever } from "react-icons/md";
 import { BiLinkExternal } from "react-icons/bi";
 export default function RentalTable({
   rentals,
   onEditing,
+  onDelete,
 }: {
   rentals: rentalDataType[];
   onEditing: (arg: rentalDataType) => void;
+  onDelete: (arg: rentalDataType) => void;
 }) {
-  const { apis } = useContext(mainContext);
-
   const columns = [
     {
       name: "Book Title",
@@ -40,11 +38,6 @@ export default function RentalTable({
       selector: (row: any) => <div>{row.returnDate && "Overdue"}</div>,
       sortable: true,
     },
-    /* {
-      name: "Full name",
-      selector: (row: any) => `${row.firstName || ""} ${row.lastName || ""}`,
-      sortable: true,
-    }, */
     {
       name: "Actions",
       cell: (record: any) => {
@@ -58,7 +51,9 @@ export default function RentalTable({
             />
             <MdOutlineDeleteForever
               className=" link-like"
-              onClick={() => apis("rental", "delete", record)}
+              onClick={() => {
+                onDelete(record);
+              }}
             />
           </div>
         );

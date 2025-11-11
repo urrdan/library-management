@@ -24,6 +24,6 @@ export const rentalAPIs = (
       setRentals(modifiedRentals);
       break;
     default:
-      console.log("error");
+    //console.log("error");
   }
 };

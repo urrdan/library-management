@@ -9,9 +9,13 @@ import {
   type rentalDataType,
 } from "../../apis/data/rentalData";
 import { IoMdAdd } from "react-icons/io";
+import ConfirmationModal from "../../components/ConfirmationModal";
 
 export default function Rentals() {
-  const { rentals } = useContext(mainContext);
+  const { rentals, apis } = useContext(mainContext);
+  const [openDelete, setOpenDelete] = useState(false);
+  const [RecordToBeDeleted, setRecordToBeDeleted] =
+    useState<null | rentalDataType>(null);
 
   const [openNewRental, setOpenNewRental] = useState(false);
   const [openEditRental, setOpenEditRental] = useState(false);
@@ -35,6 +39,10 @@ export default function Rentals() {
         onEditing={(record) => {
           setEditingData(record);
           setOpenEditRental(true);
+        }}
+        onDelete={(record) => {
+          setRecordToBeDeleted(record);
+          setOpenDelete(true);
         }}
       />
       {openNewRental && (
@@ -64,6 +72,17 @@ export default function Rentals() {
             isEditing
           />
         </MyModal>
+      )}
+      {openDelete && (
+        <ConfirmationModal
+          onClose={() => setOpenDelete(false)}
+          onConfirm={() => {
+            apis("rental", "delete", RecordToBeDeleted);
+            setRecordToBeDeleted(null);
+            setOpenDelete(false);
+          }}
+          content="Are you sure you want to delete this record?"
+        />
       )}
     </div>
   );
