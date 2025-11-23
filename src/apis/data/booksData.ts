@@ -1,12 +1,22 @@
 export interface bookDataType {
-  bookId: number;
+  bookId?: number | null;
   title: string;
-  inStore: number;
-  totalCopies: number;
+  inStore: number | null;
+  totalCopies: number | null;
   genre: string;
   author: string;
-  pages: number;
+  pages: number | null;
 }
+
+export const bookDataTemplate = {
+  title: "",
+  inStore: null,
+  totalCopies: null,
+  genre: "",
+  author: "",
+  pages: null,
+};
+
 export const booksData: bookDataType[] = [
   {
     bookId: 12,

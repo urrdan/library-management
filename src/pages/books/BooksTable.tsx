@@ -1,44 +1,40 @@
 import DataTable from "react-data-table-component";
-import MyButton from "../../components/MyButton";
-import { CgDetailsMore } from "react-icons/cg";
-import { booksData } from "../../apis/data/booksData";
-export default function BooksTable() {
+
+import { AiOutlineMenu } from "react-icons/ai";
+import type { bookDataType } from "../../apis/data/booksData";
+export default function BooksTable({ books }: { books: bookDataType[] }) {
   const columns = [
     {
       name: "Title",
       selector: (row: any) => row.title,
       sortable: true,
+      grow: 3,
     },
     {
       name: "Author",
       selector: (row: any) => row.author,
+      grow: 2,
     },
     {
       name: "Genre",
       selector: (row: any) => row.genre,
+      grow: 2,
     },
     {
       name: "In Store / Total",
       selector: (row: any) => `${row.inStore} / ${row.totalCopies}`,
+      grow: 2,
     },
     {
-      name: "Actions",
-      cell: () => {
-        return (
-          <div>
-            <MyButton title="Return" className="mr-1" sm />
-            <CgDetailsMore />
-          </div>
-        );
-      },
-      sortable: true,
+      name: "",
+      cell: () => <AiOutlineMenu className="text-xl link-like" />,
     },
   ];
 
   return (
     <div>
       <DataTable
-        data={booksData}
+        data={books}
         columns={columns}
         pagination
         paginationPerPage={10}
