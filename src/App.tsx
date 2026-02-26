@@ -5,12 +5,9 @@ import Sidebar from "./layout/sidebar/Sidebar";
 import { MainContext } from "./pages/MainContext";
 import { RxAvatar } from "react-icons/rx";
 import { FiUploadCloud } from "react-icons/fi";
+import { ToastContainer } from "react-toastify";
 
 function App() {
-  const p = [];
-  for (let i = 0; i < 20; i++) {
-    p.push(i);
-  }
   return (
     <HashRouter>
       <MainContext>
@@ -26,6 +23,13 @@ function App() {
             </div>
             <div className="p-4 flex-grow overflow-auto ">
               <MainDisplay />
+              <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop
+              />
+              ;
             </div>
           </div>
         </div>

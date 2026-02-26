@@ -1,0 +1,25 @@
+.loading-wrapper
+    //background: yellow
+    width: 100%
+    //height: 100%
+    display: flex
+    justify-content: center
+    align-items: center
+    padding: 10px
+    .loading-comp
+        width: 60px
+        height: 60px
+        border-radius: 100%
+        border-top: gray 2px solid
+        border-left: gray 2px solid
+        animation: loadingAnimation 1.5s infinite linear
+
+
+
+@keyframes loadingAnimation
+    0% 
+        transform: rotate(0deg)
+    50% 
+        transform: rotate(180deg)
+    100%
+        transform: rotate(360deg)

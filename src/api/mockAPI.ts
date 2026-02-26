@@ -10,26 +10,27 @@ const deleteSuccessDefaultMessage = "Success: Record deleted.";
 const deleteErrorDefaultMessage = "Error: Deleting Resource!";
 const notFoundErrorMessage = "Resource not found";
 
+type Endpoint = "/books" | "/loans";
 export type SuccessResponse<T> = {
   data: T;
   message: string | null;
 };
 
-const setupDefaultData = (url: string) => {
-  //type Endpoint="/books"|"/users"| "/loans" //etc
+const setupDefaultData = (url: Endpoint) => {
   const map: Record<string, {}[]> = {
     "/books": books,
+    //more to come e.g users, loans
   };
   return map[url] ? map[url] : [];
 };
 
-const getResource = <T>(url: string): T[] => {
+const getResource = <T>(url: Endpoint): T[] => {
   try {
     let fromStore = sessionStorage.getItem(url);
     if (fromStore == null) {
       const defaultData = setupDefaultData(url);
       if (defaultData) {
-        let fromStore = JSON.stringify(defaultData);
+        fromStore = JSON.stringify(defaultData);
         sessionStorage.setItem(url, fromStore);
       }
     }
@@ -45,7 +46,7 @@ const checkExistence = <T extends { id: string }>(data: T[], id: string) => {
 };
 
 //endpoints
-export const getApi = <T>(url: string): Promise<SuccessResponse<T[]>> => {
+export const getApi = <T>(url: Endpoint): Promise<SuccessResponse<T[]>> => {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       try {
@@ -58,7 +59,7 @@ export const getApi = <T>(url: string): Promise<SuccessResponse<T[]>> => {
 };
 
 export const postApi = <T>(
-  url: string,
+  url: Endpoint,
   body: T,
 ): Promise<SuccessResponse<string>> => {
   return new Promise((resolve, reject) => {
@@ -78,7 +79,7 @@ export const postApi = <T>(
 };
 
 export const updateApi = <T extends { id: string }>(
-  url: string,
+  url: Endpoint,
   id: string,
   body: Partial<Omit<T, "id">>,
 ): Promise<SuccessResponse<string>> => {
@@ -86,6 +87,7 @@ export const updateApi = <T extends { id: string }>(
     setTimeout(() => {
       try {
         const data = getResource<T>(url);
+
         if (!checkExistence(data, id)) {
           reject({ data: id, message: notFoundErrorMessage });
           return;
@@ -109,7 +111,7 @@ export const updateApi = <T extends { id: string }>(
 };
 
 export const deleteApi = (
-  url: string,
+  url: Endpoint,
   id: string,
 ): Promise<SuccessResponse<string>> => {
   return new Promise((resolve, reject) => {
@@ -124,7 +126,7 @@ export const deleteApi = (
         sessionStorage.setItem(url, JSON.stringify(requestBody));
         resolve({ data: id, message: deleteSuccessDefaultMessage });
       } catch {
-        reject({ data: id, message: deleteErrorDefaultMessage, f: 8 });
+        reject({ data: id, message: deleteErrorDefaultMessage });
       }
     }, timeout);
   });
