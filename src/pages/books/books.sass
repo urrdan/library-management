@@ -1,0 +1,26 @@
+.book-title
+    display: flex
+    align-items: center
+    padding: 8px 0
+    .book-cover
+        max-width: 40px
+        padding-right: 10px
+        box-shadow: 0 0 10 rgb(100,100,100)
+.availability
+    border: solid 1px green
+    border-radius: 8px
+    padding: 3px 10px
+    background: #0c9712
+    color: white
+    &.low-count
+        background: yellow
+    &.empty-count
+        background: red
+.book-actions
+    display: flex
+    flex-direction: row
+    background: red
+    justify-content: space-between
+    align-items: center
+    width: 100%
+    max-width: 60px
