@@ -1,7 +1,7 @@
-type props = {
-  label?: string | undefined;
-  type?: string | undefined;
-  value?: string | number | undefined;
+type InputProps = {
+  label?: string;
+  type?: string;
+  value?: string;
   error?: boolean;
   onChange?: (value: string) => void;
 };
@@ -12,9 +12,7 @@ export default function MyInput({
   value,
   error,
   onChange,
-}: props) {
-  console.log(error);
-
+}: InputProps) {
   return (
     <div className="">
       {label && (
@@ -27,7 +25,9 @@ export default function MyInput({
         className="p-2 py-1 w-full border-1 border-gray-400 rounded-lg"
         type={type}
         value={value}
-        onChange={(e) => onChange && onChange(e.target.value)}
+        onChange={(e) => {
+          onChange?.(e.target.value);
+        }}
         //onBlur={(e) => onChange && onChange(e.target.value)}
       ></input>
       {error && (
