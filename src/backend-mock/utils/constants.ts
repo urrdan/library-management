@@ -1,4 +1,11 @@
 export const API_TIMEOUT = 500;
+export const endpoints = {
+  books: "books",
+  rentals: "rentals",
+  customers: "customers",
+  staff: "staff",
+} as const; //urls source of truth
+
 export const messages = {
   getError: "Error: Fetching Resource",
   postSuccess: "Success: Record Added.",

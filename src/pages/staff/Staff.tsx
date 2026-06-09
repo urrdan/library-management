@@ -1,31 +1,32 @@
 import { useEffect, useState } from "react";
+import StaffsTable from "./StaffTable";
 import apiWithToast from "src/api/toastifiedApi";
-import { getCustomersAPI } from "src/api/customersApi";
+import { getStaffsAPI } from "src/api/staffApi";
 import Loading from "src/components/loading/Loading";
-import type { Customer } from "src/types/customerTypes";
-import CustomerForm from "./CustomerForm";
+import type { Staff } from "src/types/staffTypes";
+import StaffForm from "./StaffForm";
 import MyButton from "src/components/MyButton";
 import { IoMdAdd } from "react-icons/io";
-import CustomersTable from "./CustomersTable";
 
-export default function Customers() {
-  const [customers, setCustomers] = useState<Customer[]>([]);
+export default function Staff() {
+  const [staffs, setStaffs] = useState<Staff[]>([]);
   const [openModal, setOpenModal] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  function getCustomers() {
-    apiWithToast(getCustomersAPI())
+  function getStaffs() {
+    apiWithToast(getStaffsAPI())
       .then((res) => {
         let data = res.data;
         data.map((r) => r);
-        setCustomers(res.data);
+        console.log(data[0]);
+        setStaffs(res.data);
         setLoading(false);
       })
       .catch((err) => console.log(err));
   }
 
   useEffect(() => {
-    getCustomers();
+    getStaffs();
   }, []);
   return (
     <>
@@ -37,20 +38,20 @@ export default function Customers() {
             <div></div>
             <MyButton
               icon={<IoMdAdd />}
-              title="New Customer"
+              title="New Staff"
               onClick={() => {
                 setOpenModal(true);
               }}
             />
           </div>
-          <CustomersTable customers={customers} getCustomers={getCustomers} />
+          <StaffsTable staffs={staffs} getStaffs={getStaffs} />
           {openModal && (
-            <CustomerForm
+            <StaffForm
               onClose={() => {
                 setOpenModal(false);
               }}
               isEditing={false}
-              callBack={() => getCustomers()}
+              callBack={() => getStaffs()}
             />
           )}
         </>

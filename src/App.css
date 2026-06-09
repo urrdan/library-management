@@ -36,3 +36,6 @@ h5 {
   color: rgb(45, 45, 45);
   text-transform: uppercased;
 }
+.rdt_TableCell > * {
+  white-space: normal !important;
+}

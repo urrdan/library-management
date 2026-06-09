@@ -4,11 +4,11 @@ import MyModal from "./MyModal";
 export default function ({
   onClose,
   onConfirm,
-  content,
+  content = "Are you sure you want to delete this record?",
 }: {
   onClose: () => void;
   onConfirm: () => void;
-  content: string;
+  content?: string;
 }) {
   return (
     <MyModal onClose={onClose}>

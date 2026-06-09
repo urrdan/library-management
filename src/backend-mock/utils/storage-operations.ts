@@ -1,15 +1,24 @@
-import type { Book, Rental } from "src/types/types";
-import { endpoints } from "src/utils/constants";
 import booksDB from "../database/booksDB";
 import rentalsDB from "../database/rentalsDB";
+import customersDB from "../database/customersDb";
+import staffDB from "../database/staffDB";
+import type { Customer } from "src/types/customerTypes";
+import type { Staff } from "src/types/staffTypes";
+import { endpoints } from "./constants";
+import type { Rental } from "src/types/rentalTypes";
+import type { Book } from "src/types/bookTypes";
 
 export type StorageSchema = {
-  books: Book[];
-  rentals: Rental[];
+  [endpoints.books]: Book[];
+  [endpoints.rentals]: Rental[];
+  [endpoints.customers]: Customer[];
+  [endpoints.staff]: Staff[];
 };
 const storageMap: StorageSchema = {
   [endpoints.books]: booksDB,
   [endpoints.rentals]: rentalsDB,
+  [endpoints.customers]: customersDB,
+  [endpoints.staff]: staffDB,
 };
 
 export function readStorage<K extends keyof StorageSchema>(key: K) {

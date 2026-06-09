@@ -1,41 +1,39 @@
 import DataTable, { type TableColumn } from "react-data-table-component";
 
-import type { Customer } from "src/types/customerTypes";
+import type { Staff } from "src/types/staffTypes";
 import { RiDeleteBin2Line } from "react-icons/ri";
-import { deleteCustomerAPI } from "src/api/customersApi";
+import { deleteStaffAPI } from "src/api/staffApi";
 import apiWithToast from "src/api/toastifiedApi";
 import { useState } from "react";
 import ConfirmationModal from "src/components/ConfirmationModal";
-import CustomerForm from "./CustomerForm";
+import StaffForm from "./StaffForm";
 import { BiLinkExternal } from "react-icons/bi";
 import { mainPagination } from "src/utils/constants";
 
-export default function CustomersTable({
-  customers,
-  getCustomers,
+export default function StaffsTable({
+  staffs,
+  getStaffs,
 }: {
-  customers: Customer[];
-  getCustomers: () => void;
+  staffs: Staff[];
+  getStaffs: () => void;
 }) {
   const [openEditModal, setOpenEditModal] = useState(false);
-  const [selectedCustomer, setSelectedCustomer] = useState<null | Customer>(
-    null,
-  );
+  const [selectedStaff, setSelectedStaff] = useState<null | Staff>(null);
   const [openDelete, setOpenDelete] = useState(false);
-  const [recordToBeDeleted, setRecordToBeDeleted] = useState<null | Customer>(
+  const [recordToBeDeleted, setRecordToBeDeleted] = useState<null | Staff>(
     null,
   );
 
-  const onDeleteCustomer = (customer: Customer) => {
-    apiWithToast(deleteCustomerAPI(customer.id))
+  const onDeleteStaff = (staff: Staff) => {
+    apiWithToast(deleteStaffAPI(staff.id))
       .then(() => {
-        getCustomers();
+        getStaffs();
         setRecordToBeDeleted(null);
         setOpenDelete(false);
       })
       .catch((res) => console.log(res.message));
   };
-  const columns: TableColumn<Customer>[] = [
+  const columns: TableColumn<Staff>[] = [
     {
       name: "First Name",
       selector: (row) => row.firstName,
@@ -56,8 +54,8 @@ export default function CustomersTable({
       grow: 2,
     },
     {
-      name: "Status",
-      selector: (row) => row.status,
+      name: "Role",
+      selector: (row) => row.role,
     },
     {
       name: "Actions",
@@ -67,7 +65,7 @@ export default function CustomersTable({
             <BiLinkExternal
               className="link-like mr-3"
               onClick={() => {
-                setSelectedCustomer(row);
+                setSelectedStaff(row);
                 setOpenEditModal(true);
               }}
             />
@@ -88,7 +86,7 @@ export default function CustomersTable({
   return (
     <div>
       <DataTable
-        data={customers}
+        data={staffs}
         columns={columns}
         pagination
         paginationPerPage={10}
@@ -100,18 +98,18 @@ export default function CustomersTable({
             setOpenDelete(false);
             setRecordToBeDeleted(null);
           }}
-          onConfirm={() => onDeleteCustomer(recordToBeDeleted)}
+          onConfirm={() => onDeleteStaff(recordToBeDeleted)}
         />
       )}
-      {openEditModal && selectedCustomer && (
-        <CustomerForm
+      {openEditModal && selectedStaff && (
+        <StaffForm
           onClose={() => {
             setOpenEditModal(false);
-            setSelectedCustomer(null);
+            setSelectedStaff(null);
           }}
-          selectedCustomer={selectedCustomer}
+          selectedStaff={selectedStaff}
           isEditing
-          callBack={() => getCustomers()}
+          callBack={() => getStaffs()}
         />
       )}
     </div>
