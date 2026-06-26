@@ -1,20 +1,22 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 
 export default function SidebarNavigation() {
+  const activePath = useLocation().pathname;
+  console.log(useLocation());
   const data = [
-    { label: "Overview", path: "/" },
+    { label: "Dashboard", path: "/" },
     { label: "Rentals", path: "/rentals" },
     { label: "Books", path: "/books" },
     { label: "Customers", path: "/customers" },
-    { label: "Staff", path: "/" },
+    { label: "Staff", path: "/staff" },
   ];
   return (
-    <div className="grow-1 my-4 ">
+    <div className=" sidebar-navs-wrapper">
       {data.map((nav, index) => (
         <NavLink
           to={nav.path}
           key={index}
-          className="my-2 p-2 rounded-lg hover:bg-gray-700 hover:cursor-pointer block"
+          className={`sidebar-nav ${activePath === nav.path && "active-nav"}`}
         >
           {nav.label}
         </NavLink>

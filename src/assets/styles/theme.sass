@@ -1,0 +1,9 @@
+@use "tokens" as token
+
+
+:root
+    @each $name, $value in token.$colors
+        --color-#{$name}: #{$value}
+    @each $name, $value in token.$spacing
+        --spacing-#{$name}: #{$value}
+         

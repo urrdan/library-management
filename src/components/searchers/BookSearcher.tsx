@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import MySearchInput from "./MySearchInput";
-import { booksData, type bookDataType } from "../../apis/data/booksData";
+import type { Book } from "src/pages/books/bookTypes";
+import { getBooksAPI } from "src/api/booksApi";
 
 export default function BookSearcher({
   value,
@@ -9,21 +10,27 @@ export default function BookSearcher({
   error,
 }: {
   value: string;
-  onSelect: (selectedBook: bookDataType) => void;
+  onSelect: (selectedBook: Book) => void;
   label?: string;
   error?: boolean;
 }) {
-  const [searchResult, setSearchResult] = useState<bookDataType[]>([]);
+  const [searchResult, setSearchResult] = useState<Book[]>([]);
+  const [books, setBooks] = useState<Book[]>([]);
+
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
-    let filteredResult: bookDataType[] = [];
+    let filteredResult: Book[] = [];
     if (value)
-      filteredResult = booksData.filter((x) =>
-        x.title.toLocaleLowerCase().includes(value)
+      filteredResult = books.filter((x) =>
+        x.title.toLocaleLowerCase().includes(value),
       );
 
     setSearchResult(filteredResult);
   };
+
+  useEffect(() => {
+    getBooksAPI().then((res) => setBooks(res.data));
+  }, []);
 
   const resultStructure = () => {
     return (
@@ -38,7 +45,7 @@ export default function BookSearcher({
           >
             <div>{item.title}</div>
             <div className="text-gray-500 flex justify-end">
-              Instore: {item.inStore}/{item.totalCopies}
+              Instore: {item.availableCopies}/{item.totalCopies}
             </div>
             <hr className="mt-2 mb-3 text-gray-200" />
           </div>

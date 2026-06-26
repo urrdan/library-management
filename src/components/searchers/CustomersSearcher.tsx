@@ -1,9 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import MySearchInput from "./MySearchInput";
-import {
-  customersData,
-  type customerDataType,
-} from "../../apis/data/CustomersData";
+import { getCustomersAPI } from "src/api/customersApi";
+import type { Customer } from "src/types/customerTypes";
+import { nameJoiner } from "src/utils/fullNameFormatter";
 
 export default function CustomerSearcher({
   value,
@@ -12,20 +11,27 @@ export default function CustomerSearcher({
   error,
 }: {
   value: string;
-  onSelect: (selectedCustomer: customerDataType) => void;
+  onSelect: (selectedCustomer: Customer) => void;
   label?: string;
   error?: boolean;
 }) {
-  const [searchResult, setSearchResult] = useState<customerDataType[]>([]);
+  const [data, setData] = useState<Customer[]>([]);
+  const [searchResult, setSearchResult] = useState<Customer[]>([]);
+  const getData = () => {
+    getCustomersAPI().then((res) => {
+      console.log(res.data);
+      setData(res.data);
+    });
+  };
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
-    let filteredResult: customerDataType[] = [];
+    let filteredResult: Customer[] = [];
     if (value)
-      filteredResult = customersData.filter((x) =>
-        x.customerName.toLocaleLowerCase().includes(value)
-      );
-
+      filteredResult = data.filter((x) => {
+        let name = nameJoiner(x);
+        return name.toLocaleLowerCase().includes(value);
+      });
     setSearchResult(filteredResult);
   };
 
@@ -40,12 +46,14 @@ export default function CustomerSearcher({
             }}
             className="px-2 my-2 link-like"
           >
-            {item.customerName}
+            {nameJoiner(item)}
           </div>
         ))}
       </>
     );
   };
+
+  useEffect(getData, []);
   return (
     <MySearchInput
       label={label}

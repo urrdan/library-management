@@ -1,0 +1,25 @@
+.sidebar
+    background: var(--color-gray-800)
+    width: 250px
+    display: flex
+    padding: var(--spacing-md)
+    flex-direction: column
+    color: var(--color-text-light)
+
+    .sidebar-logo
+        text-align: center
+        font-weight: bold
+        font-size: var(--spacing-xl)
+        
+    .sidebar-navs-wrapper
+        background: var(--color-nav-bg)
+        flex-grow: 1
+        margin: var(--spacing-lg) 0
+        .sidebar-nav
+            display: block
+            padding: var(--spacing-md)
+            margin: var(--spacing-md) 0
+            border-radius: var(--spacing-md)
+            &:hover, &.active-nav
+                background: var(--color-nav-active)
+        

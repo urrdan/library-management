@@ -1,4 +1,4 @@
-import MyButton from "./MyButton";
+import MyButton from "../my-button/MyButton";
 import MyModal from "./MyModal";
 
 export default function ({

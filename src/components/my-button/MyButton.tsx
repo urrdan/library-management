@@ -1,4 +1,5 @@
 import type { JSX } from "react";
+import "./MyButton.sass";
 
 type props = {
   title?: string;
@@ -11,12 +12,10 @@ export default function ({ onClick, title, icon, sm, className }: props) {
   return (
     <button
       onClick={onClick}
-      className={`link-like px-2.5 py-0.5 ${
-        sm && "px-1 py-0.25 text-[0.85rem]"
-      } bg-blue-400 flex items-center rounded-sm text-white ${className}`}
+      className={`link-like  ${sm && "sm"}   ${className} my-button`}
     >
-      <div className="text-lg mr-1">{icon && icon}</div>
-      <span>{title && title}</span>
+      <div className="my-button-icon">{icon && icon}</div>
+      <span className="my-button-title">{title && title}</span>
     </button>
   );
 }

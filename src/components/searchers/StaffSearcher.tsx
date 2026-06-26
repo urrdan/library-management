@@ -1,6 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import MySearchInput from "./MySearchInput";
-import { staffData, type staffDataType } from "../../apis/data/staffData";
+import { staffData } from "../../apis/data/staffData";
+import { getStaffsAPI } from "src/api/staffApi";
+import type { Staff } from "src/types/staffTypes";
+import { nameJoiner } from "src/utils/fullNameFormatter";
 
 export default function StaffSearcher({
   value,
@@ -9,19 +12,26 @@ export default function StaffSearcher({
   error,
 }: {
   value: string;
-  onSelect: (selectedStaff: staffDataType) => void;
+  onSelect: (selectedStaff: Staff) => void;
   label?: string;
   error?: boolean;
 }) {
-  const [searchResult, setSearchResult] = useState<staffDataType[]>([]);
-
+  const [searchResult, setSearchResult] = useState<Staff[]>([]);
+  const [data, setData] = useState<Staff[]>([]);
+  const getData = () => {
+    getStaffsAPI().then((res) => {
+      console.log(res.data);
+      setData(res.data);
+    });
+  };
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
-    let filteredResult: staffDataType[] = [];
+    let filteredResult: Staff[] = [];
     if (value)
-      filteredResult = staffData.filter((x) =>
-        x.staffName.toLocaleLowerCase().includes(value)
-      );
+      filteredResult = data.filter((x) => {
+        const name = nameJoiner(x);
+        return name.toLocaleLowerCase().includes(value);
+      });
 
     setSearchResult(filteredResult);
   };
@@ -37,12 +47,13 @@ export default function StaffSearcher({
             }}
             className="px-2 my-2 link-like"
           >
-            {item.staffName}
+            {nameJoiner(item)}
           </div>
         ))}
       </>
     );
   };
+  useEffect(getData, []);
   return (
     <MySearchInput
       label={label}

@@ -6,6 +6,7 @@ import { MainContext } from "./pages/MainContext";
 import { RxAvatar } from "react-icons/rx";
 import { FiUploadCloud } from "react-icons/fi";
 import { ToastContainer } from "react-toastify";
+import "src/assets/styles/theme.sass";
 
 function App() {
   return (
@@ -29,7 +30,6 @@ function App() {
                 hideProgressBar={false}
                 newestOnTop
               />
-              ;
             </div>
           </div>
         </div>

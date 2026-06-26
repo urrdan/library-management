@@ -1,3 +1,5 @@
+import "./my-input.sass";
+
 type InputProps = {
   label?: string;
   type?: string;
