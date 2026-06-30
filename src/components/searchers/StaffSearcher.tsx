@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import MySearchInput from "./MySearchInput";
-import { staffData } from "../../apis/data/staffData";
 import { getStaffsAPI } from "src/api/staffApi";
 import type { Staff } from "src/types/staffTypes";
 import { nameJoiner } from "src/utils/fullNameFormatter";
