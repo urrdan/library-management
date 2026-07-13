@@ -1,3 +1,5 @@
+import type { Rental } from "src/types/rentalTypes";
+
 export default [
   {
     id: "11",
@@ -8,7 +10,8 @@ export default [
     staffId: "1",
     staffName: "John Doe",
     rentedDate: "2025-09-25",
-    returnDate: "2025-10-06",
+    dueDate: "2025-09-30",
+    returnedDate: null,
   },
   {
     id: "13",
@@ -19,6 +22,7 @@ export default [
     staffId: "2",
     staffName: "Michael Brown",
     rentedDate: "2025-09-29",
-    returnDate: "2025-10-14",
+    dueDate: "2025-10-06",
+    returnedDate: "2025-10-14",
   },
-];
+] satisfies Rental[];
