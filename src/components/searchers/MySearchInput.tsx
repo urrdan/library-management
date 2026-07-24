@@ -1,4 +1,5 @@
 import { useEffect, useState, type JSX } from "react";
+import "../my-input/my-input.sass";
 import { BiSearch } from "react-icons/bi";
 
 type props = {
@@ -8,6 +9,7 @@ type props = {
   //searchResult: any[];
   resultStructure: () => JSX.Element;
   value: string;
+  disabled?: boolean;
 };
 
 export default function MySearchInput({
@@ -17,31 +19,31 @@ export default function MySearchInput({
   resultStructure,
   value,
   error,
+  disabled = false,
 }: props) {
   const [opened, setOpened] = useState(false);
   const [inputValue, setInputValue] = useState(value);
 
   const closeResultWindow = () => {
     setInputValue(value || "");
-    setTimeout(() => {
-      setOpened(false);
-    }, 1000);
+    setOpened(false);
   };
+
   useEffect(() => {
     setInputValue(value);
   }, [value]);
   return (
-    <div className="relative">
+    <div className="my-input">
       <div>
-        {label && <label className="">{label}</label>}
-        {error && (
-          <span className="ml-1 text-red-500 text-lg font-bold">!</span>
-        )}
+        {label && <label className="my-input-label">{label}</label>}
+        {error && <span className="my-input-error-sign">!</span>}
       </div>
-      <div className="flex items-center">
+      <div
+        className={`my-input-field my-input-search ${error ? "my-input-field-error" : ""} ${disabled ? "my-input-disabled" : ""}`}
+      >
         <input
           type="search"
-          className="p-2 py-1 border-1 border-r-0 border-gray-400 rounded-lg rounded-r-none"
+          className="my-input-search-field"
           value={inputValue}
           onBlur={closeResultWindow}
           onChange={(e) => {
@@ -49,16 +51,13 @@ export default function MySearchInput({
             setOpened(true);
             onChange(e);
           }}
+          disabled={disabled}
         ></input>
-        <BiSearch className="text-[30px] text-gray-400  p-1 border-1 rounded-lg rounded-l-none" />
+        <BiSearch className=" my-input-search-icon" />
       </div>
-      {error && (
-        <p className="text-red-500 italic text-sm">This field is required</p>
-      )}
+      {error && <p className="my-input-error-text">This field is required</p>}
       {opened ? (
-        <div className=" w-full z-1  absolute overflow-y-scroll shadow-gray-400  shadow-[0_0_10px] bg-white max-h-40 rounded-lg">
-          {resultStructure()}
-        </div>
+        <div className="my-input-search-result">{resultStructure()}</div>
       ) : (
         <></>
       )}

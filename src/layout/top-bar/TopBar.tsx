@@ -11,7 +11,7 @@ const TopBar = () => {
   };
 
   return (
-    <div className="p-2 px-4 flex justify-between bg-white top-bar">
+    <div className="p-2 px-4 flex justify-between  top-bar">
       <div className="top-bar-title">{getPageTitle(activePath)}</div>
       <div className="text-2xl">
         <RxAvatar />

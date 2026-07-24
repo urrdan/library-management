@@ -5,6 +5,7 @@ type InputProps = {
   type?: string;
   value?: string;
   error?: boolean;
+  disabled?: boolean;
   onChange?: (value: string) => void;
 };
 
@@ -13,28 +14,28 @@ export default function MyInput({
   type,
   value,
   error,
+  disabled,
   onChange,
 }: InputProps) {
   return (
-    <div className="">
+    <div className="my-input">
       {label && (
         <div>
-          <label className="">{label}</label>{" "}
-          {error && <span className="text-red-500 text-lg">!</span>}
+          <label className="my-input-label">{label}</label>{" "}
+          {error && <span className="my-input-error-sign">!</span>}
         </div>
       )}
       <input
-        className="p-2 py-1 w-full border-1 border-gray-400 rounded-lg"
+        className={` my-input-field ${error ? "my-input-field-error" : ""} ${disabled ? "my-input-disabled" : ""}`}
         type={type}
         value={value}
         onChange={(e) => {
           onChange?.(e.target.value);
         }}
+        disabled={disabled}
         //onBlur={(e) => onChange && onChange(e.target.value)}
       ></input>
-      {error && (
-        <p className="text-red-500 italic text-xs">This field is required</p>
-      )}
+      {error && <p className="my-input-error-text">This field is required</p>}
     </div>
   );
 }
