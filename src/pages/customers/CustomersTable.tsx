@@ -1,14 +1,11 @@
-import DataTable, { type TableColumn } from "react-data-table-component";
-
-import type { Customer } from "src/types/customerTypes";
-import { RiDeleteBin2Line } from "react-icons/ri";
+import { useState } from "react";
+import type { TableColumn } from "react-data-table-component";
 import { deleteCustomerAPI } from "src/api/customersApi";
 import apiWithToast from "src/api/toastifiedApi";
-import { useState } from "react";
-import ConfirmationModal from "src/components/ConfirmationModal";
+import RecordsTable from "src/components/records-table/RecordsTable";
+import { personColumns } from "src/components/records-table/personColumns";
+import type { Customer } from "src/types/customerTypes";
 import CustomerForm from "./CustomerForm";
-import { BiLinkExternal } from "react-icons/bi";
-import { mainPagination } from "src/utils/constants";
 
 export default function CustomersTable({
   customers,
@@ -17,103 +14,40 @@ export default function CustomersTable({
   customers: Customer[];
   getCustomers: () => void;
 }) {
-  const [openEditModal, setOpenEditModal] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<null | Customer>(
-    null,
-  );
-  const [openDelete, setOpenDelete] = useState(false);
-  const [recordToBeDeleted, setRecordToBeDeleted] = useState<null | Customer>(
     null,
   );
 
   const onDeleteCustomer = (customer: Customer) => {
     apiWithToast(deleteCustomerAPI(customer.id))
-      .then(() => {
-        getCustomers();
-        setRecordToBeDeleted(null);
-        setOpenDelete(false);
-      })
+      .then(() => getCustomers())
       .catch((res) => console.log(res.message));
   };
+
   const columns: TableColumn<Customer>[] = [
-    {
-      name: "First Name",
-      selector: (row) => row.firstName,
-      sortable: true,
-    },
-    {
-      name: "Last Name",
-      selector: (row) => row.lastName,
-    },
-    {
-      name: "Phone",
-      selector: (row) => row.phone,
-      grow: 1.5,
-    },
-    {
-      name: "Email",
-      selector: (row) => row.email,
-      grow: 2,
-    },
+    ...personColumns<Customer>(),
     {
       name: "Status",
       selector: (row) => row.status,
     },
-    {
-      name: "Actions",
-      cell: (row) => {
-        return (
-          <div className="flex justify-around text-2xl">
-            <BiLinkExternal
-              className="link-like mr-3"
-              onClick={() => {
-                setSelectedCustomer(row);
-                setOpenEditModal(true);
-              }}
-            />
-            <RiDeleteBin2Line
-              className="link-like"
-              onClick={() => {
-                setRecordToBeDeleted(row);
-                setOpenDelete(true);
-              }}
-            />
-          </div>
-        );
-      },
-      sortable: true,
-    },
   ];
 
   return (
-    <div>
-      <DataTable
+    <>
+      <RecordsTable
         data={customers}
         columns={columns}
-        pagination
-        paginationPerPage={10}
-        paginationRowsPerPageOptions={mainPagination}
+        onEdit={setSelectedCustomer}
+        onDelete={onDeleteCustomer}
       />
-      {openDelete && recordToBeDeleted && (
-        <ConfirmationModal
-          onClose={() => {
-            setOpenDelete(false);
-            setRecordToBeDeleted(null);
-          }}
-          onConfirm={() => onDeleteCustomer(recordToBeDeleted)}
-        />
-      )}
-      {openEditModal && selectedCustomer && (
+      {selectedCustomer && (
         <CustomerForm
-          onClose={() => {
-            setOpenEditModal(false);
-            setSelectedCustomer(null);
-          }}
+          onClose={() => setSelectedCustomer(null)}
           selectedCustomer={selectedCustomer}
           isEditing
-          callBack={() => getCustomers()}
+          callBack={getCustomers}
         />
       )}
-    </div>
+    </>
   );
 }

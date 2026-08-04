@@ -1,5 +1,8 @@
 export type Book = {
   id: string;
+} & BookProfile;
+
+export type BookProfile = {
   title: string;
   totalCopies: number;
   availableCopies: number;
@@ -10,8 +13,8 @@ export type Book = {
   coverImageUrl?: string;
   releasedDate: string;
 };
+
 export type BookInputForm = {
-  //id: string;
   title: string;
   totalCopies: string;
   availableCopies: string;

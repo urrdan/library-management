@@ -1,12 +1,12 @@
-import DataTable, { type TableColumn } from "react-data-table-component";
-
-import { AiOutlineMenu } from "react-icons/ai";
-import type { Book } from "./bookTypes";
-import BookForm from "./BookForm";
 import { useState } from "react";
-import { RiDeleteBin2Line } from "react-icons/ri";
-import { deleteApi } from "src/api/mockAPI";
+import type { TableColumn } from "react-data-table-component";
+import { AiOutlineMenu } from "react-icons/ai";
+import { deleteBookAPI } from "src/api/booksApi";
 import apiWithToast from "src/api/toastifiedApi";
+import RecordsTable from "src/components/records-table/RecordsTable";
+import type { Book } from "src/types/bookTypes";
+import BookForm from "./BookForm";
+
 export default function BooksTable({
   books,
   getBooks,
@@ -14,13 +14,14 @@ export default function BooksTable({
   books: Book[];
   getBooks: () => void;
 }) {
-  const [openEditModal, setOpenEditModal] = useState(false);
   const [selectedBook, setSelectedBook] = useState<null | Book>(null);
+
   const deleteBook = (book: Book) => {
-    apiWithToast(deleteApi("/books", book.id)).then(() => {
-      getBooks();
-    });
+    apiWithToast(deleteBookAPI(book.id))
+      .then(() => getBooks())
+      .catch((res) => console.log(res.message));
   };
+
   const columns: TableColumn<Book>[] = [
     {
       name: "Title",
@@ -65,43 +66,25 @@ export default function BooksTable({
       },
       grow: 2,
     },
-    {
-      name: "",
-      cell: (row) => (
-        <div className="book-actions">
-          <AiOutlineMenu
-            className="text-xl link-like"
-            onClick={() => {
-              setSelectedBook(row);
-              setOpenEditModal(true);
-            }}
-          />
-          <RiDeleteBin2Line onClick={() => deleteBook(row)} />
-        </div>
-      ),
-    },
   ];
 
   return (
-    <div>
-      <DataTable
+    <>
+      <RecordsTable
         data={books}
         columns={columns}
-        pagination
-        paginationPerPage={10}
-        paginationRowsPerPageOptions={[5, 10, 50, 100]}
+        onEdit={setSelectedBook}
+        onDelete={deleteBook}
+        editIcon={<AiOutlineMenu />}
       />
-      {openEditModal && selectedBook && (
+      {selectedBook && (
         <BookForm
-          onClose={() => {
-            setOpenEditModal(false);
-            setSelectedBook(null);
-          }}
+          onClose={() => setSelectedBook(null)}
           selectedBook={selectedBook}
           isEditing
-          callBack={() => getBooks()}
+          callBack={getBooks}
         />
       )}
-    </div>
+    </>
   );
 }

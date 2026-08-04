@@ -1,14 +1,11 @@
-import DataTable, { type TableColumn } from "react-data-table-component";
-
-import type { Staff } from "src/types/staffTypes";
-import { RiDeleteBin2Line } from "react-icons/ri";
+import { useState } from "react";
+import type { TableColumn } from "react-data-table-component";
 import { deleteStaffAPI } from "src/api/staffApi";
 import apiWithToast from "src/api/toastifiedApi";
-import { useState } from "react";
-import ConfirmationModal from "src/components/ConfirmationModal";
+import RecordsTable from "src/components/records-table/RecordsTable";
+import { personColumns } from "src/components/records-table/personColumns";
+import type { Staff } from "src/types/staffTypes";
 import StaffForm from "./StaffForm";
-import { BiLinkExternal } from "react-icons/bi";
-import { mainPagination } from "src/utils/constants";
 
 export default function StaffsTable({
   staffs,
@@ -17,101 +14,38 @@ export default function StaffsTable({
   staffs: Staff[];
   getStaffs: () => void;
 }) {
-  const [openEditModal, setOpenEditModal] = useState(false);
   const [selectedStaff, setSelectedStaff] = useState<null | Staff>(null);
-  const [openDelete, setOpenDelete] = useState(false);
-  const [recordToBeDeleted, setRecordToBeDeleted] = useState<null | Staff>(
-    null,
-  );
 
   const onDeleteStaff = (staff: Staff) => {
     apiWithToast(deleteStaffAPI(staff.id))
-      .then(() => {
-        getStaffs();
-        setRecordToBeDeleted(null);
-        setOpenDelete(false);
-      })
+      .then(() => getStaffs())
       .catch((res) => console.log(res.message));
   };
+
   const columns: TableColumn<Staff>[] = [
-    {
-      name: "First Name",
-      selector: (row) => row.firstName,
-      sortable: true,
-    },
-    {
-      name: "Last Name",
-      selector: (row) => row.lastName,
-    },
-    {
-      name: "Phone",
-      selector: (row) => row.phone,
-      grow: 1.5,
-    },
-    {
-      name: "Email",
-      selector: (row) => row.email,
-      grow: 2,
-    },
+    ...personColumns<Staff>(),
     {
       name: "Role",
       selector: (row) => row.role,
     },
-    {
-      name: "Actions",
-      cell: (row) => {
-        return (
-          <div className="flex justify-around text-2xl">
-            <BiLinkExternal
-              className="link-like mr-3"
-              onClick={() => {
-                setSelectedStaff(row);
-                setOpenEditModal(true);
-              }}
-            />
-            <RiDeleteBin2Line
-              className="link-like"
-              onClick={() => {
-                setRecordToBeDeleted(row);
-                setOpenDelete(true);
-              }}
-            />
-          </div>
-        );
-      },
-      sortable: true,
-    },
   ];
 
   return (
-    <div>
-      <DataTable
+    <>
+      <RecordsTable
         data={staffs}
         columns={columns}
-        pagination
-        paginationPerPage={10}
-        paginationRowsPerPageOptions={mainPagination}
+        onEdit={setSelectedStaff}
+        onDelete={onDeleteStaff}
       />
-      {openDelete && recordToBeDeleted && (
-        <ConfirmationModal
-          onClose={() => {
-            setOpenDelete(false);
-            setRecordToBeDeleted(null);
-          }}
-          onConfirm={() => onDeleteStaff(recordToBeDeleted)}
-        />
-      )}
-      {openEditModal && selectedStaff && (
+      {selectedStaff && (
         <StaffForm
-          onClose={() => {
-            setOpenEditModal(false);
-            setSelectedStaff(null);
-          }}
+          onClose={() => setSelectedStaff(null)}
           selectedStaff={selectedStaff}
           isEditing
-          callBack={() => getStaffs()}
+          callBack={getStaffs}
         />
       )}
-    </div>
+    </>
   );
 }

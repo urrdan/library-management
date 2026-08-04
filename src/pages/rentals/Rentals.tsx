@@ -1,79 +1,31 @@
-import { useEffect, useState } from "react";
-import { IoMdAdd } from "react-icons/io";
-import apiWithToast from "src/api/toastifiedApi";
-import { getApi } from "src/api/mockAPI";
-import Loading from "src/components/loading/Loading";
-import MyModal from "src/components/MyModal";
-import MyButton from "src/components/MyButton";
-import RentalTable from "./RentalTable";
+import { useState } from "react";
+import { getRentalsAPI } from "src/api/rentalApi";
+import MyModal from "src/components/my-modal/MyModal";
+import ResourcePage from "src/components/resource-page/ResourcePage";
+import { useResource } from "src/hooks/useResource";
 import RentalForm from "./RentalForm";
-
-export type Rental = {
-  id: string;
-  bookId: string;
-  bookTitle: string;
-  customerId: string;
-  customerName: string;
-  staffId: string;
-  staffName: string;
-  rentedDate: string;
-  returnDate: string;
-};
+import RentalTable from "./RentalTable";
 
 export default function Rentals() {
-  const [rentalData, setRentalData] = useState<Rental[]>([]);
-  const [loading, setLoading] = useState(true);
-
+  const { data: rentals, loading, refresh } = useResource(getRentalsAPI);
   const [openNewRental, setOpenNewRental] = useState(false);
 
-  function getRentals() {
-    apiWithToast(getApi("/rentals"))
-      .then((res) => {
-        let data = res.data;
-        data.map((r) => r);
-        console.log(data);
-        setRentalData(res.data);
-        setLoading(false);
-      })
-      .catch((err) => console.log(err));
-  }
-
-  useEffect(() => {
-    getRentals();
-  }, []);
-
   return (
-    <div>
-      {loading ? (
-        <Loading />
-      ) : (
-        <>
-          <div className="mb-4 flex justify-between ">
-            <div></div>
-            <MyButton
-              icon={<IoMdAdd />}
-              title="New Rental"
-              onClick={() => {
-                setOpenNewRental(true);
-              }}
-            />
-          </div>
-          <RentalTable rentals={rentalData} getRentals={getRentals} />
-          {openNewRental && (
-            <MyModal
-              onClose={() => {
-                setOpenNewRental(false);
-              }}
-            >
-              <RentalForm
-                isEditing={false}
-                onClose={() => setOpenNewRental(false)}
-                getRentals={getRentals}
-              />
-            </MyModal>
-          )}
-        </>
+    <ResourcePage
+      loading={loading}
+      newRecordTitle="New Rental"
+      onNewRecord={() => setOpenNewRental(true)}
+    >
+      <RentalTable rentals={rentals} getRentals={refresh} />
+      {openNewRental && (
+        <MyModal onClose={() => setOpenNewRental(false)}>
+          <RentalForm
+            isEditing={false}
+            onClose={() => setOpenNewRental(false)}
+            getRentals={refresh}
+          />
+        </MyModal>
       )}
-    </div>
+    </ResourcePage>
   );
 }
