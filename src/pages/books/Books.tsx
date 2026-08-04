@@ -1,71 +1,30 @@
-import { useEffect, useState } from "react";
-import MyButton from "../../components/MyButton";
-import BooksTable from "./BooksTable";
-import { IoMdAdd } from "react-icons/io";
-import BookForm from "./BookForm";
-import apiWithToast from "src/api/toastifiedApi";
-import { getApi } from "src/api/mockAPI";
-import type { Book } from "./bookTypes";
+import { useState } from "react";
+import { getBooksAPI } from "src/api/booksApi";
+import ResourcePage from "src/components/resource-page/ResourcePage";
+import { useResource } from "src/hooks/useResource";
 import "src/pages/books/books.sass";
-import Loading from "src/components/loading/Loading";
+import BookForm from "./BookForm";
+import BooksTable from "./BooksTable";
 
 export default function Books() {
-  const [books, setBooks] = useState<Book[]>([]);
+  const { data: books, loading, refresh } = useResource(getBooksAPI);
   const [openModal, setOpenModal] = useState(false);
-  const [loading, setLoading] = useState(true);
-
-  function getBooks() {
-    apiWithToast(getApi<Book>("/books"))
-      .then((res) => {
-        let data = res.data;
-        data.map((r) => r);
-        console.log(data[4]);
-        setBooks(res.data);
-        setLoading(false);
-      })
-      .catch((err) => console.log(err));
-  }
-
-  useEffect(() => {
-    getBooks();
-  }, []);
 
   return (
-    <div style={{ height: 300, width: "100%" }}>
-      {loading ? (
-        <Loading />
-      ) : (
-        <>
-          <div className="mb-4 flex justify-between ">
-            <div></div>
-            <MyButton
-              icon={<IoMdAdd />}
-              title="New Book"
-              onClick={() => {
-                setOpenModal(true);
-              }}
-            />
-            <MyButton
-              icon={<IoMdAdd />}
-              title="Refreshi"
-              onClick={() => {
-                getBooks();
-              }}
-            />
-          </div>
-          <BooksTable books={books} getBooks={getBooks} />
-
-          {openModal && (
-            <BookForm
-              onClose={() => {
-                setOpenModal(false);
-              }}
-              isEditing={false}
-              callBack={() => getBooks()}
-            />
-          )}
-        </>
+    <ResourcePage
+      loading={loading}
+      newRecordTitle="New Book"
+      onNewRecord={() => setOpenModal(true)}
+      onRefresh={refresh}
+    >
+      <BooksTable books={books} getBooks={refresh} />
+      {openModal && (
+        <BookForm
+          onClose={() => setOpenModal(false)}
+          isEditing={false}
+          callBack={refresh}
+        />
       )}
-    </div>
+    </ResourcePage>
   );
 }

@@ -1,60 +1,28 @@
-import { useEffect, useState } from "react";
-import apiWithToast from "src/api/toastifiedApi";
+import { useState } from "react";
 import { getCustomersAPI } from "src/api/customersApi";
-import Loading from "src/components/loading/Loading";
-import type { Customer } from "src/types/customerTypes";
+import ResourcePage from "src/components/resource-page/ResourcePage";
+import { useResource } from "src/hooks/useResource";
 import CustomerForm from "./CustomerForm";
-import MyButton from "src/components/MyButton";
-import { IoMdAdd } from "react-icons/io";
 import CustomersTable from "./CustomersTable";
 
 export default function Customers() {
-  const [customers, setCustomers] = useState<Customer[]>([]);
+  const { data: customers, loading, refresh } = useResource(getCustomersAPI);
   const [openModal, setOpenModal] = useState(false);
-  const [loading, setLoading] = useState(true);
 
-  function getCustomers() {
-    apiWithToast(getCustomersAPI())
-      .then((res) => {
-        let data = res.data;
-        data.map((r) => r);
-        setCustomers(res.data);
-        setLoading(false);
-      })
-      .catch((err) => console.log(err));
-  }
-
-  useEffect(() => {
-    getCustomers();
-  }, []);
   return (
-    <>
-      {loading ? (
-        <Loading />
-      ) : (
-        <>
-          <div className="mb-4 flex justify-end ">
-            <div></div>
-            <MyButton
-              icon={<IoMdAdd />}
-              title="New Customer"
-              onClick={() => {
-                setOpenModal(true);
-              }}
-            />
-          </div>
-          <CustomersTable customers={customers} getCustomers={getCustomers} />
-          {openModal && (
-            <CustomerForm
-              onClose={() => {
-                setOpenModal(false);
-              }}
-              isEditing={false}
-              callBack={() => getCustomers()}
-            />
-          )}
-        </>
+    <ResourcePage
+      loading={loading}
+      newRecordTitle="New Customer"
+      onNewRecord={() => setOpenModal(true)}
+    >
+      <CustomersTable customers={customers} getCustomers={refresh} />
+      {openModal && (
+        <CustomerForm
+          onClose={() => setOpenModal(false)}
+          isEditing={false}
+          callBack={refresh}
+        />
       )}
-    </>
+    </ResourcePage>
   );
 }

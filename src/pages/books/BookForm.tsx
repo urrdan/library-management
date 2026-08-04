@@ -1,13 +1,17 @@
 import { MdClose } from "react-icons/md";
-import MyButton from "../../components/MyButton";
-import MyInput from "../../components/MyInput";
-import MyModal, { MyModalBody, MyModalHead } from "../../components/MyModal";
 import { useState } from "react";
+import MyButton from "src/components/my-button/MyButton";
+import MyInput from "src/components/my-input/MyInput";
+import MyModal, {
+  MyModalBody,
+  MyModalHead,
+} from "src/components/my-modal/MyModal";
 import apiWithToast from "src/api/toastifiedApi";
-import { postApi, updateApi } from "src/api/mockAPI";
-import type { Book, BookInputForm } from "./bookTypes";
+import { createBookAPI, updateBookAPI } from "src/api/booksApi";
+import type { Book, BookInputForm } from "src/types/bookTypes";
+import formValidation from "src/utils/formValidation";
 
-const bookTemplate = {
+const bookTemplate: BookInputForm = {
   title: "",
   totalCopies: "",
   availableCopies: "",
@@ -18,6 +22,16 @@ const bookTemplate = {
   coverImageUrl: "",
   releasedDate: "",
 };
+
+const fieldsToBeValidated: (keyof BookInputForm)[] = [
+  "title",
+  "totalCopies",
+  "availableCopies",
+  "genre",
+  "author",
+  "pages",
+  "releasedDate",
+];
 
 type CreateProps = {
   isEditing: false;
@@ -30,31 +44,23 @@ type EditProps = {
 };
 
 type BookFormProps = { onClose: () => void; callBack: () => void } & (
-  | CreateProps
-  | EditProps
+  CreateProps | EditProps
 );
 
+const toInputForm = (book: Book): BookInputForm => ({
+  ...book,
+  totalCopies: book.totalCopies.toString(),
+  availableCopies: book.availableCopies.toString(),
+  pages: book.pages.toString(),
+});
+
+const toNumber = (value: string) => (value === "" ? NaN : Number(value));
+
 export default function BookForm(props: BookFormProps) {
-  const fieldsToBeValidated: (keyof BookInputForm)[] = [
-    "title",
-    "totalCopies",
-    "availableCopies",
-    "genre",
-    "author",
-    "pages",
-    //"isbn",
-    "releasedDate",
-  ];
   const { isEditing, onClose, callBack, selectedBook } = props;
 
   const [stateData, setStateData] = useState<BookInputForm>(
-    (selectedBook && {
-      ...selectedBook,
-      totalCopies: selectedBook.totalCopies.toString(),
-      pages: selectedBook.pages.toString(),
-      availableCopies: selectedBook.availableCopies.toString(),
-    }) ||
-      bookTemplate,
+    selectedBook ? toInputForm(selectedBook) : bookTemplate,
   );
   const [errorData, setErrorData] = useState<
     Partial<Record<keyof BookInputForm, boolean>>
@@ -67,52 +73,26 @@ export default function BookForm(props: BookFormProps) {
     setStateData((prev) => ({ ...prev, [propName]: value }));
   };
 
-  function validateData<T>(
-    data: T, //object to be validated
-    fieldsToValidate: (keyof T)[], //prop names
-  ) {
-    const result: Partial<Record<keyof T, boolean>> = {};
-    fieldsToValidate.forEach((x) => {
-      if (!data[x] && data[x] !== 0) result[x] = true;
-    });
-    return {
-      errorObj: result,
-      hasError: Object.values(result).some((x) => x == true),
-    };
-  }
   const onSave = () => {
-    console.log(stateData);
-    function convertToDomain(x: string): number {
-      if (x != "") return Number(x);
-      return NaN;
-    }
-
     const dataToSubmit = {
       ...stateData,
-      totalCopies: convertToDomain(stateData.totalCopies),
-      pages: convertToDomain(stateData.pages),
-      availableCopies: convertToDomain(stateData.availableCopies),
+      totalCopies: toNumber(stateData.totalCopies),
+      availableCopies: toNumber(stateData.availableCopies),
+      pages: toNumber(stateData.pages),
     };
-    const { errorObj, hasError } = validateData(
-      dataToSubmit,
+    const { errorObj, hasError } = formValidation(
+      stateData,
       fieldsToBeValidated,
     );
     setErrorData(errorObj);
-    if (hasError) {
-      console.log("express validation errors", errorObj);
-    } else {
-      console.log("call APi");
-    }
-
     if (hasError) return;
 
     const apiPromise = isEditing
-      ? apiWithToast(updateApi("/books", selectedBook.id, dataToSubmit))
-      : apiWithToast(postApi("/books", dataToSubmit));
+      ? apiWithToast(updateBookAPI(dataToSubmit, selectedBook.id))
+      : apiWithToast(createBookAPI(dataToSubmit));
 
     apiPromise
-      .then((res) => {
-        res;
+      .then(() => {
         callBack();
         onClose();
       })
@@ -139,29 +119,21 @@ export default function BookForm(props: BookFormProps) {
           <MyInput
             label="Title"
             value={stateData.title}
-            onChange={(value) => {
-              onChange("title", value);
-            }}
+            onChange={(value) => onChange("title", value)}
             error={errorData.title}
           />
           <MyInput
             label="Genre"
             value={stateData.genre}
-            onChange={(value) => {
-              onChange("genre", value);
-            }}
+            onChange={(value) => onChange("genre", value)}
             error={errorData.genre}
           />
-
           <MyInput
             label="Author"
             value={stateData.author}
-            onChange={(value) => {
-              onChange("author", value);
-            }}
+            onChange={(value) => onChange("author", value)}
             error={errorData.author}
           />
-
           <MyInput
             label="Total Copies"
             type="number"
@@ -178,9 +150,9 @@ export default function BookForm(props: BookFormProps) {
           />
           <MyInput
             label="Pages"
+            type="number"
             value={stateData.pages}
             onChange={(value) => onChange("pages", value)}
-            type="number"
             error={errorData.pages}
           />
           <MyInput

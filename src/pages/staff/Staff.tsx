@@ -1,61 +1,28 @@
-import { useEffect, useState } from "react";
-import StaffsTable from "./StaffTable";
-import apiWithToast from "src/api/toastifiedApi";
+import { useState } from "react";
 import { getStaffsAPI } from "src/api/staffApi";
-import Loading from "src/components/loading/Loading";
-import type { Staff } from "src/types/staffTypes";
+import ResourcePage from "src/components/resource-page/ResourcePage";
+import { useResource } from "src/hooks/useResource";
 import StaffForm from "./StaffForm";
-import MyButton from "src/components/MyButton";
-import { IoMdAdd } from "react-icons/io";
+import StaffsTable from "./StaffTable";
 
 export default function Staff() {
-  const [staffs, setStaffs] = useState<Staff[]>([]);
+  const { data: staffs, loading, refresh } = useResource(getStaffsAPI);
   const [openModal, setOpenModal] = useState(false);
-  const [loading, setLoading] = useState(true);
 
-  function getStaffs() {
-    apiWithToast(getStaffsAPI())
-      .then((res) => {
-        let data = res.data;
-        data.map((r) => r);
-        console.log(data[0]);
-        setStaffs(res.data);
-        setLoading(false);
-      })
-      .catch((err) => console.log(err));
-  }
-
-  useEffect(() => {
-    getStaffs();
-  }, []);
   return (
-    <>
-      {loading ? (
-        <Loading />
-      ) : (
-        <>
-          <div className="mb-4 flex justify-end ">
-            <div></div>
-            <MyButton
-              icon={<IoMdAdd />}
-              title="New Staff"
-              onClick={() => {
-                setOpenModal(true);
-              }}
-            />
-          </div>
-          <StaffsTable staffs={staffs} getStaffs={getStaffs} />
-          {openModal && (
-            <StaffForm
-              onClose={() => {
-                setOpenModal(false);
-              }}
-              isEditing={false}
-              callBack={() => getStaffs()}
-            />
-          )}
-        </>
+    <ResourcePage
+      loading={loading}
+      newRecordTitle="New Staff"
+      onNewRecord={() => setOpenModal(true)}
+    >
+      <StaffsTable staffs={staffs} getStaffs={refresh} />
+      {openModal && (
+        <StaffForm
+          onClose={() => setOpenModal(false)}
+          isEditing={false}
+          callBack={refresh}
+        />
       )}
-    </>
+    </ResourcePage>
   );
 }

@@ -1,13 +1,12 @@
-import DataTable, { type TableColumn } from "react-data-table-component";
-import { MdOutlineDeleteForever } from "react-icons/md";
-import { BiLinkExternal } from "react-icons/bi";
 import { useState } from "react";
-import ConfirmationModal from "src/components/ConfirmationModal";
-import RentalForm from "./RentalForm";
-import MyModal from "src/components/MyModal";
+import type { TableColumn } from "react-data-table-component";
+import { deleteRentalAPI } from "src/api/rentalApi";
 import apiWithToast from "src/api/toastifiedApi";
-import { deleteApi } from "src/api/mockAPI";
-import type { Rental } from "src/types/types";
+import MyModal from "src/components/my-modal/MyModal";
+import RecordsTable from "src/components/records-table/RecordsTable";
+import type { Rental } from "src/types/rentalTypes";
+import RentalForm from "./RentalForm";
+
 export default function RentalTable({
   rentals,
   getRentals,
@@ -15,19 +14,14 @@ export default function RentalTable({
   rentals: Rental[];
   getRentals: () => void;
 }) {
-  const [openEditRental, setOpenEditRental] = useState(false);
   const [editingData, setEditingData] = useState<Rental | null>(null);
-  const [openDelete, setOpenDelete] = useState(false);
-  const [recordToBeDeleted, setRecordToBeDeleted] = useState<null | Rental>(
-    null,
-  );
+
   const onDeleting = (record: Rental) => {
-    apiWithToast(deleteApi("/rentals", record?.id)).then(() => {
-      getRentals();
-      setRecordToBeDeleted(null);
-      setOpenDelete(false);
-    });
+    apiWithToast(deleteRentalAPI(record.id))
+      .then(() => getRentals())
+      .catch((res) => console.log(res.message));
   };
+
   const columns: TableColumn<Rental>[] = [
     {
       name: "Book Title",
@@ -48,77 +42,36 @@ export default function RentalTable({
       grow: 2,
     },
     {
-      name: "Return Date",
-      selector: (row) => row.returnDate,
+      name: "Due Date",
+      selector: (row) => row.dueDate,
       sortable: true,
       grow: 2,
     },
     {
       name: "Status",
-      cell: (row) => <div>{row.returnDate && "Overdue"}</div>,
-      sortable: true,
-    },
-    {
-      name: "Actions",
-      cell: (record: any) => {
-        return (
-          <div className="flex text-2xl">
-            <BiLinkExternal
-              className=" link-like mr-2"
-              onClick={() => {
-                setEditingData(record);
-                setOpenEditRental(true);
-              }}
-            />
-            <MdOutlineDeleteForever
-              className=" link-like"
-              onClick={() => {
-                setRecordToBeDeleted(record);
-                setOpenDelete(true);
-              }}
-            />
-          </div>
-        );
-      },
+      cell: (row) => <div>{row.returnedDate ? "Returned" : "Rented"}</div>,
       sortable: true,
     },
   ];
 
   return (
-    <div>
-      <DataTable
+    <>
+      <RecordsTable
         data={rentals}
         columns={columns}
-        pagination
-        paginationPerPage={10}
-        paginationRowsPerPageOptions={[5, 10, 50, 100]}
+        onEdit={setEditingData}
+        onDelete={onDeleting}
       />
-      {openDelete && recordToBeDeleted && (
-        <ConfirmationModal
-          onClose={() => {
-            setOpenDelete(false);
-            setRecordToBeDeleted(null);
-          }}
-          onConfirm={() => onDeleting(recordToBeDeleted)}
-        />
-      )}
-      {openEditRental && editingData && (
-        <MyModal
-          onClose={() => {
-            setOpenEditRental(false);
-          }}
-        >
+      {editingData && (
+        <MyModal onClose={() => setEditingData(null)}>
           <RentalForm
             isEditing
             editingRecord={editingData}
             getRentals={getRentals}
-            onClose={() => {
-              setOpenEditRental(false);
-              setEditingData(null);
-            }}
+            onClose={() => setEditingData(null)}
           />
         </MyModal>
       )}
-    </div>
+    </>
   );
 }

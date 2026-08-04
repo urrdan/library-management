@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react";
-import MySearchInput from "./MySearchInput";
 import { getStaffsAPI } from "src/api/staffApi";
 import type { Staff } from "src/types/staffTypes";
 import { nameJoiner } from "src/utils/fullNameFormatter";
+import EntitySearcher from "./EntitySearcher";
 
 export default function StaffSearcher({
   value,
@@ -15,51 +14,14 @@ export default function StaffSearcher({
   label?: string;
   error?: boolean;
 }) {
-  const [searchResult, setSearchResult] = useState<Staff[]>([]);
-  const [data, setData] = useState<Staff[]>([]);
-  const getData = () => {
-    getStaffsAPI().then((res) => {
-      console.log(res.data);
-      setData(res.data);
-    });
-  };
-  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.target;
-    let filteredResult: Staff[] = [];
-    if (value)
-      filteredResult = data.filter((x) => {
-        const name = nameJoiner(x);
-        return name.toLocaleLowerCase().includes(value);
-      });
-
-    setSearchResult(filteredResult);
-  };
-
-  const resultStructure = () => {
-    return (
-      <>
-        {searchResult.map((item, index) => (
-          <div
-            key={index}
-            onClick={() => {
-              onSelect(item);
-            }}
-            className="px-2 my-2 link-like"
-          >
-            {nameJoiner(item)}
-          </div>
-        ))}
-      </>
-    );
-  };
-  useEffect(getData, []);
   return (
-    <MySearchInput
-      label={label}
-      onChange={onChange}
-      resultStructure={resultStructure}
+    <EntitySearcher
       value={value}
+      label={label}
       error={error}
+      fetchItems={getStaffsAPI}
+      searchText={nameJoiner}
+      onSelect={onSelect}
     />
   );
 }
