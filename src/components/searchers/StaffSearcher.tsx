@@ -3,6 +3,7 @@ import MySearchInput from "./MySearchInput";
 import { getStaffsAPI } from "src/api/staffApi";
 import type { Staff } from "src/types/staffTypes";
 import { nameJoiner } from "src/utils/fullNameFormatter";
+import { reportError } from "src/utils/errorUtils";
 
 export default function StaffSearcher({
   value,
@@ -18,10 +19,9 @@ export default function StaffSearcher({
   const [searchResult, setSearchResult] = useState<Staff[]>([]);
   const [data, setData] = useState<Staff[]>([]);
   const getData = () => {
-    getStaffsAPI().then((res) => {
-      console.log(res.data);
-      setData(res.data);
-    });
+    getStaffsAPI()
+      .then((res) => setData(res.data))
+      .catch((err: unknown) => reportError("StaffSearcher.getData", err));
   };
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;

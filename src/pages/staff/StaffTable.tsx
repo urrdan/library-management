@@ -9,6 +9,7 @@ import ConfirmationModal from "src/components/ConfirmationModal";
 import StaffForm from "./StaffForm";
 import { BiLinkExternal } from "react-icons/bi";
 import { mainPagination } from "src/utils/constants";
+import { reportError } from "src/utils/errorUtils";
 
 export default function StaffsTable({
   staffs,
@@ -31,7 +32,7 @@ export default function StaffsTable({
         setRecordToBeDeleted(null);
         setOpenDelete(false);
       })
-      .catch((res) => console.log(res.message));
+      .catch((err: unknown) => reportError("deleteStaff", err));
   };
   const columns: TableColumn<Staff>[] = [
     {

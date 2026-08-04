@@ -3,6 +3,7 @@ import MySearchInput from "./MySearchInput";
 import { getCustomersAPI } from "src/api/customersApi";
 import type { Customer } from "src/types/customerTypes";
 import { nameJoiner } from "src/utils/fullNameFormatter";
+import { reportError } from "src/utils/errorUtils";
 
 export default function CustomerSearcher({
   value,
@@ -18,10 +19,9 @@ export default function CustomerSearcher({
   const [data, setData] = useState<Customer[]>([]);
   const [searchResult, setSearchResult] = useState<Customer[]>([]);
   const getData = () => {
-    getCustomersAPI().then((res) => {
-      console.log(res.data);
-      setData(res.data);
-    });
+    getCustomersAPI()
+      .then((res) => setData(res.data))
+      .catch((err: unknown) => reportError("CustomerSearcher.getData", err));
   };
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -29,7 +29,7 @@ export default function CustomerSearcher({
     let filteredResult: Customer[] = [];
     if (value)
       filteredResult = data.filter((x) => {
-        let name = nameJoiner(x);
+        const name = nameJoiner(x);
         return name.toLocaleLowerCase().includes(value);
       });
     setSearchResult(filteredResult);

@@ -4,26 +4,20 @@ import {
   updateRecordOperation,
 } from "../utils/records-operations";
 import { readStorage, writeStorage } from "../utils/storage-operations";
-import { messages } from "../utils/constants";
+import { endpoints, messages } from "../utils/constants";
 import { delay } from "../utils/delay";
+import { NotFoundError, rethrowError } from "../utils/error";
 import type { Book } from "src/types/types";
-import { endpoints } from "src/api/mockAPI";
 
 const BOOKS_STORAGE_KEY = endpoints.books;
 
-class NotFoundError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = "NotFoundError";
-  }
-}
 export async function getBooksController() {
   try {
     await delay();
     const books = readStorage(BOOKS_STORAGE_KEY);
     return books;
-  } catch {
-    throw new Error(messages.getError);
+  } catch (error) {
+    rethrowError(error, messages.getError);
   }
 }
 
@@ -36,8 +30,8 @@ export async function createBookController(
     const updatedBooks = createRecordOperation(books, book);
     writeStorage(BOOKS_STORAGE_KEY, updatedBooks);
     return messages.postSuccess;
-  } catch {
-    throw new Error(messages.postError);
+  } catch (error) {
+    rethrowError(error, messages.postError);
   }
 }
 
@@ -46,6 +40,7 @@ export async function updateBookController(
   updatedFields: Partial<Omit<Book, "id">>,
 ): Promise<string> {
   try {
+    await delay();
     const books = readStorage(BOOKS_STORAGE_KEY);
 
     if (!checkRecordExists(books, id)) {
@@ -55,7 +50,7 @@ export async function updateBookController(
     writeStorage(BOOKS_STORAGE_KEY, updatedBooks);
     return messages.updateSuccess;
   } catch (error) {
-    throw error;
+    rethrowError(error, messages.updateError);
   }
 }
 
@@ -69,9 +64,6 @@ export async function deleteBookController(id: string) {
     writeStorage(BOOKS_STORAGE_KEY, updatedBooks);
     return messages.deleteSuccess;
   } catch (error) {
-    if (error instanceof NotFoundError) {
-      throw error; // expected/business error
-    }
-    throw new Error(messages.deleteError); //unexpected
+    rethrowError(error, messages.deleteError);
   }
 }

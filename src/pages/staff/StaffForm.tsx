@@ -6,6 +6,7 @@ import { useState } from "react";
 import apiWithToast from "src/api/toastifiedApi";
 import { createStaffAPI, updateStaffAPI } from "src/api/staffApi";
 import type { Staff, StaffProfile } from "src/types/staffTypes";
+import { reportError } from "src/utils/errorUtils";
 
 const staffTemplate = {
   firstName: "",
@@ -66,7 +67,6 @@ export default function StaffForm(props: StaffFormProps) {
     };
   }
   const onSave = () => {
-    console.log(stateData);
     const { errorObj, hasError } = validateData(stateData, fieldsToBeValidated);
     setErrorData(errorObj);
 
@@ -77,12 +77,11 @@ export default function StaffForm(props: StaffFormProps) {
       : apiWithToast(createStaffAPI(stateData));
 
     apiPromise
-      .then((res) => {
-        res;
+      .then(() => {
         callBack();
         onClose();
       })
-      .catch((err) => err);
+      .catch((err: unknown) => reportError("saveStaff", err));
   };
 
   return (

@@ -7,22 +7,25 @@ import type { Staff } from "src/types/staffTypes";
 import StaffForm from "./StaffForm";
 import MyButton from "src/components/MyButton";
 import { IoMdAdd } from "react-icons/io";
+import ErrorState from "src/components/error-state/ErrorState";
+import { getErrorMessage, reportError } from "src/utils/errorUtils";
 
 export default function Staff() {
   const [staffs, setStaffs] = useState<Staff[]>([]);
   const [openModal, setOpenModal] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   function getStaffs() {
+    setLoading(true);
+    setLoadError(null);
     apiWithToast(getStaffsAPI())
-      .then((res) => {
-        let data = res.data;
-        data.map((r) => r);
-        console.log(data[0]);
-        setStaffs(res.data);
-        setLoading(false);
+      .then((res) => setStaffs(res.data))
+      .catch((err: unknown) => {
+        reportError("getStaffs", err);
+        setLoadError(getErrorMessage(err));
       })
-      .catch((err) => console.log(err));
+      .finally(() => setLoading(false));
   }
 
   useEffect(() => {
@@ -32,6 +35,8 @@ export default function Staff() {
     <>
       {loading ? (
         <Loading />
+      ) : loadError ? (
+        <ErrorState message={loadError} onRetry={getStaffs} />
       ) : (
         <>
           <div className="mb-4 flex justify-end ">

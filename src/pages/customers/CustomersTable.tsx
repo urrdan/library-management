@@ -9,6 +9,7 @@ import ConfirmationModal from "src/components/ConfirmationModal";
 import CustomerForm from "./CustomerForm";
 import { BiLinkExternal } from "react-icons/bi";
 import { mainPagination } from "src/utils/constants";
+import { reportError } from "src/utils/errorUtils";
 
 export default function CustomersTable({
   customers,
@@ -33,7 +34,7 @@ export default function CustomersTable({
         setRecordToBeDeleted(null);
         setOpenDelete(false);
       })
-      .catch((res) => console.log(res.message));
+      .catch((err: unknown) => reportError("deleteCustomer", err));
   };
   const columns: TableColumn<Customer>[] = [
     {

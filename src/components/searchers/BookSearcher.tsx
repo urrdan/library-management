@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import MySearchInput from "./MySearchInput";
 import type { Book } from "src/pages/books/bookTypes";
 import { getBooksAPI } from "src/api/booksApi";
+import { reportError } from "src/utils/errorUtils";
 
 export default function BookSearcher({
   value,
@@ -29,7 +30,9 @@ export default function BookSearcher({
   };
 
   useEffect(() => {
-    getBooksAPI().then((res) => setBooks(res.data));
+    getBooksAPI()
+      .then((res) => setBooks(res.data))
+      .catch((err: unknown) => reportError("BookSearcher.getBooks", err));
   }, []);
 
   const resultStructure = () => {

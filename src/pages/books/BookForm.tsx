@@ -6,6 +6,7 @@ import { useState } from "react";
 import apiWithToast from "src/api/toastifiedApi";
 import { postApi, updateApi } from "src/api/mockAPI";
 import type { Book, BookInputForm } from "./bookTypes";
+import { reportError } from "src/utils/errorUtils";
 
 const bookTemplate = {
   title: "",
@@ -81,7 +82,6 @@ export default function BookForm(props: BookFormProps) {
     };
   }
   const onSave = () => {
-    console.log(stateData);
     function convertToDomain(x: string): number {
       if (x != "") return Number(x);
       return NaN;
@@ -98,12 +98,6 @@ export default function BookForm(props: BookFormProps) {
       fieldsToBeValidated,
     );
     setErrorData(errorObj);
-    if (hasError) {
-      console.log("express validation errors", errorObj);
-    } else {
-      console.log("call APi");
-    }
-
     if (hasError) return;
 
     const apiPromise = isEditing
@@ -111,12 +105,11 @@ export default function BookForm(props: BookFormProps) {
       : apiWithToast(postApi("/books", dataToSubmit));
 
     apiPromise
-      .then((res) => {
-        res;
+      .then(() => {
         callBack();
         onClose();
       })
-      .catch((err) => err);
+      .catch((err: unknown) => reportError("saveBook", err));
   };
 
   return (
