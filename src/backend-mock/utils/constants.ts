@@ -15,5 +15,8 @@ export const messages = {
   deleteSuccess: "Success: Record deleted.",
   deleteError: "Error: Deleting Resource!",
   notFound: "Resource not found",
-  defaultError: "Unhandle Error",
+  defaultError: "Unexpected error",
+  storageUnavailable: "Error: Storage is unavailable",
+  storageCorrupted: "Error: Stored data is corrupted",
+  storageWriteFailed: "Error: Could not save data",
 };

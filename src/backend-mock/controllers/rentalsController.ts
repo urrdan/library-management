@@ -5,7 +5,7 @@ import {
 import { readStorage, writeStorage } from "../utils/storage-operations";
 import { endpoints, messages } from "../utils/constants";
 import { delay } from "../utils/delay";
-import { CustomError } from "../utils/error";
+import { CustomError, NotFoundError, rethrowError } from "../utils/error";
 import type { RentalEditable } from "src/types/rentalTypes";
 import type { Book } from "src/pages/books/bookTypes";
 
@@ -17,8 +17,8 @@ export async function getRentalsController() {
     await delay();
     const rentals = readStorage(RENTALS_STORAGE_KEY);
     return rentals;
-  } catch {
-    throw new Error(messages.getError);
+  } catch (error) {
+    rethrowError(error, messages.getError);
   }
 }
 
@@ -39,10 +39,7 @@ export async function createRentalController(
     writeStorage(RENTALS_STORAGE_KEY, updatedRentals);
     return messages.postSuccess;
   } catch (error) {
-    if (error instanceof CustomError) {
-      throw error; // business error
-    }
-    throw new Error(messages.postError); //unexpected
+    rethrowError(error, messages.postError);
   }
 }
 
@@ -55,7 +52,7 @@ export async function updateRentalController(
     const rentals = readStorage(RENTALS_STORAGE_KEY);
     const rentalToBeUpdated = rentals.find((rental) => rental.id === id);
     if (!rentalToBeUpdated) {
-      throw new CustomError(messages.notFound);
+      throw new NotFoundError(messages.notFound);
     }
     if (updatedFields.bookId !== rentalToBeUpdated.bookId) {
       let updatedBooks = updateBookAvailableCopies(
@@ -74,10 +71,7 @@ export async function updateRentalController(
     writeStorage(RENTALS_STORAGE_KEY, updatedRentals);
     return messages.updateSuccess;
   } catch (error) {
-    if (error instanceof CustomError) {
-      throw error; // business error
-    }
-    throw new Error(messages.updateError); //unexpected
+    rethrowError(error, messages.updateError);
   }
 }
 
@@ -86,7 +80,7 @@ export async function deleteRentalController(id: string) {
     await delay();
     const rentals = readStorage(RENTALS_STORAGE_KEY);
     const rentalToDelete = rentals.find((rental) => rental.id === id);
-    if (!rentalToDelete) throw new CustomError(messages.notFound);
+    if (!rentalToDelete) throw new NotFoundError(messages.notFound);
     const updatedRentals = rentals.filter((rental) => rental.id !== id);
     const updatedBooks = updateBookAvailableCopies(
       rentalToDelete.bookId,
@@ -97,10 +91,7 @@ export async function deleteRentalController(id: string) {
     writeStorage(RENTALS_STORAGE_KEY, updatedRentals);
     return messages.deleteSuccess;
   } catch (error) {
-    if (error instanceof CustomError) {
-      throw error; // business error
-    }
-    throw new Error(messages.deleteError); //unexpected
+    rethrowError(error, messages.deleteError);
   }
 }
 
@@ -110,7 +101,7 @@ export async function returnRentalController(id: string, returnedDate: string) {
     const rentals = readStorage(RENTALS_STORAGE_KEY);
     const rentalToBeReturned = rentals.find((rental) => rental.id === id);
     if (!rentalToBeReturned) {
-      throw new CustomError(messages.notFound);
+      throw new NotFoundError(messages.notFound);
     }
     if (rentalToBeReturned.returnedDate !== null) {
       throw new CustomError("Rental has already been returned");
@@ -130,12 +121,10 @@ export async function returnRentalController(id: string, returnedDate: string) {
     writeStorage(RENTALS_STORAGE_KEY, updatedRentals);
     return messages.updateSuccess;
   } catch (error) {
-    if (error instanceof CustomError) {
-      throw error; // business error
-    }
-    throw new Error(
+    rethrowError(
+      error,
       `Unexpected error occurred while returning rental with id ${id}`,
-    ); //unexpected
+    );
   }
 }
 
@@ -145,7 +134,7 @@ export async function undoReturnRentalController(id: string) {
     const rentals = readStorage(RENTALS_STORAGE_KEY);
     const rentalToBeUndone = rentals.find((rental) => rental.id === id);
     if (!rentalToBeUndone) {
-      throw new CustomError(messages.notFound);
+      throw new NotFoundError(messages.notFound);
     }
     if (rentalToBeUndone.returnedDate === null) {
       throw new CustomError("Rental has not been returned");
@@ -162,12 +151,10 @@ export async function undoReturnRentalController(id: string) {
     writeStorage(RENTALS_STORAGE_KEY, updatedRentals);
     return messages.updateSuccess;
   } catch (error) {
-    if (error instanceof CustomError) {
-      throw error; // business error
-    }
-    throw new Error(
+    rethrowError(
+      error,
       `Unexpected error occurred while undoing return of rental with id ${id}`,
-    ); //unexpected
+    );
   }
 }
 
@@ -198,5 +185,5 @@ function updateBookAvailableCopies(
       availableCopies: updatedAvailableCopies,
     });
   }
-  throw new CustomError(`Book with id ${bookId} not found`);
+  throw new NotFoundError(`Book with id ${bookId} not found`);
 }

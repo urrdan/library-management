@@ -17,7 +17,7 @@ export type SuccessResponse<T> = {
 };
 
 const setupDefaultData = (url: Endpoint) => {
-  const map: Record<string, {}[]> = {
+  const map: Record<string, object[]> = {
     "/books": books,
     //more to come e.g users, loans
   };
@@ -25,20 +25,16 @@ const setupDefaultData = (url: Endpoint) => {
 };
 
 const getResource = <T>(url: Endpoint): T[] => {
-  try {
-    let fromStore = sessionStorage.getItem(url);
-    if (fromStore == null) {
-      const defaultData = setupDefaultData(url);
-      if (defaultData) {
-        fromStore = JSON.stringify(defaultData);
-        sessionStorage.setItem(url, fromStore);
-      }
+  let fromStore = sessionStorage.getItem(url);
+  if (fromStore == null) {
+    const defaultData = setupDefaultData(url);
+    if (defaultData) {
+      fromStore = JSON.stringify(defaultData);
+      sessionStorage.setItem(url, fromStore);
     }
-
-    return JSON.parse(fromStore || "[]");
-  } catch {
-    return [];
   }
+
+  return JSON.parse(fromStore || "[]") as T[];
 };
 
 const checkExistence = <T extends { id: string }>(data: T[], id: string) => {
@@ -51,8 +47,8 @@ export const getApi = <T>(url: Endpoint): Promise<SuccessResponse<T[]>> => {
     setTimeout(() => {
       try {
         resolve({ data: getResource(url), message: null });
-      } catch {
-        reject({ data: {}, message: getErrorDefaultMessage });
+      } catch (error) {
+        reject(new Error(getErrorDefaultMessage, { cause: error }));
       }
     }, timeout);
   });
@@ -66,13 +62,13 @@ export const postApi = <T>(
     setTimeout(() => {
       try {
         const data = getResource<T>(url);
-        let id = String(Date.now());
+        const id = String(Date.now());
         const requestBody = [{ ...body, id }, ...data];
         sessionStorage.setItem(url, JSON.stringify(requestBody));
 
         resolve({ data: id, message: postSuccessDefaultMessage });
-      } catch {
-        reject({ data: body, message: postErrorDefaultMessage });
+      } catch (error) {
+        reject(new Error(postErrorDefaultMessage, { cause: error }));
       }
     }, timeout);
   });
@@ -89,7 +85,7 @@ export const updateApi = <T extends { id: string }>(
         const data = getResource<T>(url);
 
         if (!checkExistence(data, id)) {
-          reject({ data: id, message: notFoundErrorMessage });
+          reject(new Error(notFoundErrorMessage));
           return;
         }
         const requestBody = data.map((record) => {
@@ -103,8 +99,8 @@ export const updateApi = <T extends { id: string }>(
           data: id /*ToDO: return updatedRecord*/,
           message: updateSuccessDefaultMessage,
         });
-      } catch {
-        reject({ data: id, message: updateErrorDefaultMessage });
+      } catch (error) {
+        reject(new Error(updateErrorDefaultMessage, { cause: error }));
       }
     }, timeout);
   });
@@ -119,14 +115,14 @@ export const deleteApi = (
       try {
         const data = getResource<{ id: string }>(url);
         if (!checkExistence(data, id)) {
-          reject({ data: id, message: notFoundErrorMessage });
+          reject(new Error(notFoundErrorMessage));
           return;
         }
         const requestBody = data.filter((record) => record.id != id);
         sessionStorage.setItem(url, JSON.stringify(requestBody));
         resolve({ data: id, message: deleteSuccessDefaultMessage });
-      } catch {
-        reject({ data: id, message: deleteErrorDefaultMessage });
+      } catch (error) {
+        reject(new Error(deleteErrorDefaultMessage, { cause: error }));
       }
     }, timeout);
   });

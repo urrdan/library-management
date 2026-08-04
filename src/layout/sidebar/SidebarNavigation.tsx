@@ -2,7 +2,6 @@ import { NavLink, useLocation } from "react-router-dom";
 
 export default function SidebarNavigation() {
   const activePath = useLocation().pathname;
-  console.log(useLocation());
   const data = [
     { label: "Dashboard", path: "/" },
     { label: "Rentals", path: "/rentals" },

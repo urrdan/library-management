@@ -10,7 +10,7 @@ import type {
   CustomerSystemFields,
   CustomerProfile,
 } from "src/types/customerTypes";
-import { NotFoundError } from "../utils/error";
+import { NotFoundError, rethrowError } from "../utils/error";
 import dateUtil from "src/utils/dateUtil";
 
 const CUSTOMERS_STORAGE_KEY = endpoints.customers;
@@ -20,10 +20,8 @@ export async function getCustomersController() {
     await delay();
     const customers = readStorage(CUSTOMERS_STORAGE_KEY);
     return customers;
-  } catch (err) {
-    console.log(err);
-
-    throw new Error(messages.getError);
+  } catch (error) {
+    rethrowError(error, messages.getError);
   }
 }
 
@@ -42,8 +40,8 @@ export async function createCustomerController(
     const updatedCustomers = createRecordOperation(customers, createdCustomer);
     writeStorage(CUSTOMERS_STORAGE_KEY, updatedCustomers);
     return messages.postSuccess;
-  } catch {
-    throw new Error(messages.postError);
+  } catch (error) {
+    rethrowError(error, messages.postError);
   }
 }
 
@@ -52,6 +50,7 @@ export async function updateCustomerController(
   updatedFields: Partial<CustomerProfile>,
 ): Promise<string> {
   try {
+    await delay();
     const customers = readStorage(CUSTOMERS_STORAGE_KEY);
 
     if (!checkRecordExists(customers, id)) {
@@ -65,7 +64,7 @@ export async function updateCustomerController(
     writeStorage(CUSTOMERS_STORAGE_KEY, updatedCustomers);
     return messages.updateSuccess;
   } catch (error) {
-    throw error;
+    rethrowError(error, messages.updateError);
   }
 }
 
@@ -79,9 +78,6 @@ export async function deleteCustomerController(id: string) {
     writeStorage(CUSTOMERS_STORAGE_KEY, updatedCustomers);
     return messages.deleteSuccess;
   } catch (error) {
-    if (error instanceof NotFoundError) {
-      throw error;
-    }
-    throw new Error(messages.deleteError);
+    rethrowError(error, messages.deleteError);
   }
 }

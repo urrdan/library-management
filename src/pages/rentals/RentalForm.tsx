@@ -10,6 +10,7 @@ import { MyModalBody, MyModalHead } from "src/components/MyModal";
 import CustomerSearcher from "src/components/searchers/CustomersSearcher";
 import StaffSearcher from "src/components/searchers/StaffSearcher";
 import MyInput from "src/components/MyInput";
+import { reportError } from "src/utils/errorUtils";
 
 type CreatingProp = {
   isEditing: false;
@@ -68,7 +69,6 @@ export default function RentalForm({
       fieldsToBeValidated,
     );
     setErrorData(errorObj);
-    console.log(stateData);
     if (hasError) return;
 
     const apiPromise = isEditing
@@ -80,7 +80,7 @@ export default function RentalForm({
         getRentals();
         onClose();
       })
-      .catch((err) => err);
+      .catch((err: unknown) => reportError("saveRental", err));
   };
 
   return (

@@ -19,10 +19,7 @@ export function createRecordOperation<T extends object>(
     ...record,
     id: createId(),
   };
-  const updatedRecords = [newRecord, ...data];
-  console.log(updatedRecords);
-
-  return updatedRecords;
+  return [newRecord, ...data];
 }
 
 export function updateRecordOperation<T extends { id: string }>(

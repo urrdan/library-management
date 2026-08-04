@@ -8,22 +8,25 @@ import { getApi } from "src/api/mockAPI";
 import type { Book } from "./bookTypes";
 import "src/pages/books/books.sass";
 import Loading from "src/components/loading/Loading";
+import ErrorState from "src/components/error-state/ErrorState";
+import { getErrorMessage, reportError } from "src/utils/errorUtils";
 
 export default function Books() {
   const [books, setBooks] = useState<Book[]>([]);
   const [openModal, setOpenModal] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   function getBooks() {
+    setLoading(true);
+    setLoadError(null);
     apiWithToast(getApi<Book>("/books"))
-      .then((res) => {
-        let data = res.data;
-        data.map((r) => r);
-        console.log(data[4]);
-        setBooks(res.data);
-        setLoading(false);
+      .then((res) => setBooks(res.data))
+      .catch((err: unknown) => {
+        reportError("getBooks", err);
+        setLoadError(getErrorMessage(err));
       })
-      .catch((err) => console.log(err));
+      .finally(() => setLoading(false));
   }
 
   useEffect(() => {
@@ -34,6 +37,8 @@ export default function Books() {
     <div style={{ height: 300, width: "100%" }}>
       {loading ? (
         <Loading />
+      ) : loadError ? (
+        <ErrorState message={loadError} onRetry={getBooks} />
       ) : (
         <>
           <div className="mb-4 flex justify-between ">

@@ -8,6 +8,7 @@ import MyModal from "src/components/MyModal";
 import apiWithToast from "src/api/toastifiedApi";
 import { deleteApi } from "src/api/mockAPI";
 import type { Rental } from "src/types/types";
+import { reportError } from "src/utils/errorUtils";
 export default function RentalTable({
   rentals,
   getRentals,
@@ -22,11 +23,13 @@ export default function RentalTable({
     null,
   );
   const onDeleting = (record: Rental) => {
-    apiWithToast(deleteApi("/rentals", record?.id)).then(() => {
-      getRentals();
-      setRecordToBeDeleted(null);
-      setOpenDelete(false);
-    });
+    apiWithToast(deleteApi("/rentals", record.id))
+      .then(() => {
+        getRentals();
+        setRecordToBeDeleted(null);
+        setOpenDelete(false);
+      })
+      .catch((err: unknown) => reportError("deleteRental", err));
   };
   const columns: TableColumn<Rental>[] = [
     {
@@ -60,7 +63,7 @@ export default function RentalTable({
     },
     {
       name: "Actions",
-      cell: (record: any) => {
+      cell: (record: Rental) => {
         return (
           <div className="flex text-2xl">
             <BiLinkExternal

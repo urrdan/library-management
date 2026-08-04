@@ -1,23 +1,23 @@
 import { toast } from "react-toastify";
-import { messages } from "src/backend-mock/utils/constants";
 import type { SuccessResponse } from "src/types/apiTypes";
+import { getErrorMessage } from "src/utils/errorUtils";
 
 type CustomMessage = {
   success?: string;
   error?: string;
 };
-export default async function apiWithToast<T /* extends { message: string } */>(
+export default async function apiWithToast<T>(
   api: Promise<SuccessResponse<T>>,
   customMessage: CustomMessage = {},
 ): Promise<SuccessResponse<T>> {
   try {
     const res = await api;
     const message = customMessage.success || res.message;
-    message && toast.success(message);
+    if (message) toast.success(message);
     return res;
-  } catch (err: any) {
-    const message = customMessage.error || err.message || messages.defaultError;
-    message && toast.error(message);
+  } catch (err) {
+    const message = customMessage.error || getErrorMessage(err);
+    toast.error(message);
     throw err;
   }
 }

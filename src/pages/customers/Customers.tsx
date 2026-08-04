@@ -7,21 +7,25 @@ import CustomerForm from "./CustomerForm";
 import MyButton from "src/components/MyButton";
 import { IoMdAdd } from "react-icons/io";
 import CustomersTable from "./CustomersTable";
+import ErrorState from "src/components/error-state/ErrorState";
+import { getErrorMessage, reportError } from "src/utils/errorUtils";
 
 export default function Customers() {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [openModal, setOpenModal] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   function getCustomers() {
+    setLoading(true);
+    setLoadError(null);
     apiWithToast(getCustomersAPI())
-      .then((res) => {
-        let data = res.data;
-        data.map((r) => r);
-        setCustomers(res.data);
-        setLoading(false);
+      .then((res) => setCustomers(res.data))
+      .catch((err: unknown) => {
+        reportError("getCustomers", err);
+        setLoadError(getErrorMessage(err));
       })
-      .catch((err) => console.log(err));
+      .finally(() => setLoading(false));
   }
 
   useEffect(() => {
@@ -31,6 +35,8 @@ export default function Customers() {
     <>
       {loading ? (
         <Loading />
+      ) : loadError ? (
+        <ErrorState message={loadError} onRetry={getCustomers} />
       ) : (
         <>
           <div className="mb-4 flex justify-end ">

@@ -7,6 +7,7 @@ import { useState } from "react";
 import { RiDeleteBin2Line } from "react-icons/ri";
 import { deleteApi } from "src/api/mockAPI";
 import apiWithToast from "src/api/toastifiedApi";
+import { reportError } from "src/utils/errorUtils";
 export default function BooksTable({
   books,
   getBooks,
@@ -17,9 +18,9 @@ export default function BooksTable({
   const [openEditModal, setOpenEditModal] = useState(false);
   const [selectedBook, setSelectedBook] = useState<null | Book>(null);
   const deleteBook = (book: Book) => {
-    apiWithToast(deleteApi("/books", book.id)).then(() => {
-      getBooks();
-    });
+    apiWithToast(deleteApi("/books", book.id))
+      .then(() => getBooks())
+      .catch((err: unknown) => reportError("deleteBook", err));
   };
   const columns: TableColumn<Book>[] = [
     {

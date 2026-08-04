@@ -6,6 +6,7 @@ import { useState } from "react";
 import apiWithToast from "src/api/toastifiedApi";
 import { createCustomerAPI, updateCustomerAPI } from "src/api/customersApi";
 import type { Customer, CustomerProfile } from "src/types/customerTypes";
+import { reportError } from "src/utils/errorUtils";
 
 const customerTemplate = {
   firstName: "",
@@ -66,7 +67,6 @@ export default function CustomerForm(props: CustomerFormProps) {
     };
   }
   const onSave = () => {
-    console.log(stateData);
     const { errorObj, hasError } = validateData(stateData, fieldsToBeValidated);
     setErrorData(errorObj);
 
@@ -77,12 +77,11 @@ export default function CustomerForm(props: CustomerFormProps) {
       : apiWithToast(createCustomerAPI(stateData));
 
     apiPromise
-      .then((res) => {
-        res;
+      .then(() => {
         callBack();
         onClose();
       })
-      .catch((err) => err);
+      .catch((err: unknown) => reportError("saveCustomer", err));
   };
 
   return (

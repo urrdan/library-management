@@ -4,7 +4,8 @@ import customersDB from "../database/customersDb";
 import staffDB from "../database/staffDB";
 import type { Customer } from "src/types/customerTypes";
 import type { Staff } from "src/types/staffTypes";
-import { endpoints } from "./constants";
+import { endpoints, messages } from "./constants";
+import { StorageError } from "./error";
 import type { Rental } from "src/types/rentalTypes";
 import type { Book } from "src/types/bookTypes";
 
@@ -22,7 +23,14 @@ const storageMap: StorageSchema = {
 };
 
 export function readStorage<K extends keyof StorageSchema>(key: K) {
-  const raw = sessionStorage.getItem(key);
+  let raw: string | null;
+  try {
+    raw = sessionStorage.getItem(key);
+  } catch (error) {
+    throw new StorageError(`${messages.storageUnavailable} ('${key}')`, {
+      cause: error,
+    });
+  }
 
   if (raw === null) {
     //initialize storage
@@ -30,13 +38,25 @@ export function readStorage<K extends keyof StorageSchema>(key: K) {
     writeStorage(key, initialData);
     return initialData;
   } else if (!raw) return [] as StorageSchema[K];
-  const result = JSON.parse(raw);
-  return result as StorageSchema[K];
+
+  try {
+    return JSON.parse(raw) as StorageSchema[K];
+  } catch (error) {
+    throw new StorageError(`${messages.storageCorrupted} ('${key}')`, {
+      cause: error,
+    });
+  }
 }
 
 export function writeStorage<K extends keyof StorageSchema>(
   key: K,
   data: StorageSchema[K],
 ) {
-  sessionStorage.setItem(key, JSON.stringify(data));
+  try {
+    sessionStorage.setItem(key, JSON.stringify(data));
+  } catch (error) {
+    throw new StorageError(`${messages.storageWriteFailed} ('${key}')`, {
+      cause: error,
+    });
+  }
 }

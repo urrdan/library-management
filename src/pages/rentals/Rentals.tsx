@@ -7,6 +7,8 @@ import MyModal from "src/components/MyModal";
 import MyButton from "src/components/MyButton";
 import RentalTable from "./RentalTable";
 import RentalForm from "./RentalForm";
+import ErrorState from "src/components/error-state/ErrorState";
+import { getErrorMessage, reportError } from "src/utils/errorUtils";
 
 export type Rental = {
   id: string;
@@ -23,19 +25,20 @@ export type Rental = {
 export default function Rentals() {
   const [rentalData, setRentalData] = useState<Rental[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   const [openNewRental, setOpenNewRental] = useState(false);
 
   function getRentals() {
-    apiWithToast(getApi("/rentals"))
-      .then((res) => {
-        let data = res.data;
-        data.map((r) => r);
-        console.log(data);
-        setRentalData(res.data);
-        setLoading(false);
+    setLoading(true);
+    setLoadError(null);
+    apiWithToast(getApi<Rental>("/rentals"))
+      .then((res) => setRentalData(res.data))
+      .catch((err: unknown) => {
+        reportError("getRentals", err);
+        setLoadError(getErrorMessage(err));
       })
-      .catch((err) => console.log(err));
+      .finally(() => setLoading(false));
   }
 
   useEffect(() => {
@@ -46,6 +49,8 @@ export default function Rentals() {
     <div>
       {loading ? (
         <Loading />
+      ) : loadError ? (
+        <ErrorState message={loadError} onRetry={getRentals} />
       ) : (
         <>
           <div className="mb-4 flex justify-between ">
