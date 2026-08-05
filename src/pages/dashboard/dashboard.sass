@@ -1,12 +1,74 @@
 .dashboard
-  &-card
+
+  .dashboard-card
     border-radius: 8px
     padding: 12px
+    display: flex
+    flex-direction: column
     background: white
-  &-title
-    color: red
-  h5
-    margin-bottom: 10px
-    //text-transform: uppercase
-    font-size: 1.1rem
+    .dash-card-title-bar
+      display: flex
+      justify-content: space-between
+      align-items: center
+      padding: 8px
+    h5
+      font-size: 1.1rem
+
+  //dash-summary
+  .dash-summary-card
+    display: flex
+    gap: 16px
+    align-items: center
+    .dash-summary-card-icon
+      display: flex
+      justify-content: center
+      align-items: center
+      width: 50px
+      height: 50px
+      border-radius: 50%
+      background: var(--color-surface-offset-1)
+      &.info
+        background: var(--color-status-info-bg)
+        color: var(--color-status-info)
+      &.danger
+        background: var(--color-status-danger-bg)
+        color: var(--color-status-danger)
+      &.success
+        background: var(--color-status-success-bg)
+        color: var(--color-status-success)
+      &.neutral
+        background: var(--color-status-neutral-bg)
+        color: var(--color-status-neutral)
+
+    .dash-summary-card-title
+      color: var(--color-text-secondary)
+      font-size: 14px
+    .dash-summary-card-value
+      font-weight: bold
+      font-size: 20px
+      margin-top: 8px
+
+  //quick-actions
     
+  .dash-quick-actions
+    .dash-actions-wrapper
+      display: flex
+      flex-direction: column
+      justify-content: space-between
+      flex-grow: 1
+      .dash-action
+        width: 100%
+        padding: 12px
+        border-radius: var(--spacing-md)
+        display: flex
+        align-items: center
+        gap: 4px
+        color: var(--color-text-alternative)
+        &:nth-child(1)
+          background: var(--color-status-info)
+        &:nth-child(2)
+          background: var(--color-status-success)
+        &:nth-child(3)
+          background: var(--color-status-neutral)
+        &:nth-child(4)
+          background: var(--color-status-warning)

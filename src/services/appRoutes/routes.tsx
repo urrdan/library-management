@@ -3,12 +3,13 @@ import Books from "src/pages/books/Books";
 import Customers from "src/pages/customers/Customers";
 import Staff from "src/pages/staff/Staff";
 import Rentals from "src/pages/rentals/Rentals";
+import Dashboard from "src/pages/dashboard/Dashboard";
 
 export const ROUTES = {
   dashboard: {
     path: "/dashboard",
     title: "Dashboard",
-    element: <Overview />,
+    element: <Dashboard />,
   },
 
   books: {

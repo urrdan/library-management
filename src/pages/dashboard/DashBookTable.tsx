@@ -12,7 +12,7 @@ export default function DashBookTable({ books }: { books: Book[] }) {
             className="book-cover"
             src={row.coverImageUrl || "/images/default-book-cover.png"}
           />
-          {row.title}
+          <div className="font-normal">{row.title}</div>
         </div>
       ),
       sortable: true,
@@ -22,7 +22,7 @@ export default function DashBookTable({ books }: { books: Book[] }) {
       name: "Copies",
       selector: (row) => row.availableCopies,
       cell: (row) => (
-        <div className="text-red-600 font-bold">{row.totalCopies}</div>
+        <div className="danger-color font-bold">{row.availableCopies}</div>
       ),
       right: true,
     },
