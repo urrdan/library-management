@@ -4,11 +4,7 @@ import {
 } from "src/backend-mock/controllers/dashboardController";
 
 import type { SuccessResponse } from "src/types/apiTypes";
-import type {
-  DashboardData,
-  RentalChartPeriod,
-  RentalChartPoint,
-} from "src/types/dashboardTypes";
+import type { DashboardData, RentalChartPoint } from "src/types/dashboardTypes";
 
 export async function getDashboardAPI(): Promise<
   SuccessResponse<DashboardData>
@@ -25,11 +21,11 @@ export async function getDashboardAPI(): Promise<
   }
 }
 
-export async function getRentalChartAPI(
-  period: RentalChartPeriod,
-): Promise<SuccessResponse<RentalChartPoint[]>> {
+export async function getRentalChartAPI(): Promise<
+  SuccessResponse<RentalChartPoint[]>
+> {
   try {
-    const result = await getRentalChartController(period);
+    const result = await getRentalChartController();
 
     return {
       data: result,

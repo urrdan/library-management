@@ -93,7 +93,7 @@ export default function Dashboard() {
 
               <div className="w-50 dashboard-card dash-quick-actions">
                 <div className="dash-card-title-bar">
-                  <h5>Quick Action</h5>
+                  <h5>Quick Actions</h5>
                 </div>
                 <div className="dash-actions-wrapper">
                   <div className="dash-action">

@@ -10,7 +10,6 @@ import type {
   DashboardData,
   DashboardKPIs,
   RentalChartPoint,
-  RentalChartPeriod,
 } from "src/types/dashboardTypes";
 import { lowBookStockThreshold } from "src/utils/constants";
 
@@ -18,6 +17,7 @@ const BOOK_STORAGE_KEY = endpoints.books;
 const RENTAL_STORAGE_KEY = endpoints.rentals;
 const CUSTOMER_STORAGE_KEY = endpoints.customers;
 
+const recordLimit = 4;
 export async function getDashboardController(): Promise<DashboardData> {
   try {
     await delay();
@@ -39,15 +39,13 @@ export async function getDashboardController(): Promise<DashboardData> {
   }
 }
 
-export async function getRentalChartController(
-  period: RentalChartPeriod,
-): Promise<RentalChartPoint[]> {
+export async function getRentalChartController(): Promise<RentalChartPoint[]> {
   try {
     await delay();
 
     const rentals = readStorage(RENTAL_STORAGE_KEY);
 
-    return buildRentalChart(rentals, period);
+    return buildRentalChart(rentals);
   } catch {
     throw new Error(messages.getError);
   }
@@ -75,7 +73,7 @@ function buildRunningLowBooks(books: Book[]): Book[] {
   return books
     .filter((book) => book.availableCopies <= lowBookStockThreshold)
     .sort((a, b) => a.availableCopies - b.availableCopies)
-    .slice(0, 5);
+    .slice(0, recordLimit);
 }
 
 function buildRecentRentals(rentals: RentalView[]): RentalView[] {
@@ -84,74 +82,45 @@ function buildRecentRentals(rentals: RentalView[]): RentalView[] {
       (a, b) =>
         new Date(b.rentedDate).getTime() - new Date(a.rentedDate).getTime(),
     )
-    .slice(0, 5);
+    .slice(0, recordLimit);
 }
 
 function buildOverdueRentals(rentals: RentalView[]): RentalView[] {
   return rentals
     .filter((r) => !r.returnedDate && new Date(r.dueDate) < new Date())
-    .slice(0, 5);
+    .sort((a, b) => a.dueDate.localeCompare(b.dueDate))
+    .slice(0, recordLimit);
 }
 
-function buildRentalChart(
-  rentals: Rental[],
-  period: RentalChartPeriod,
-): RentalChartPoint[] {
+function buildRentalChart(rentals: Rental[]): RentalChartPoint[] {
   const today = new Date();
 
-  if (period === "week") {
-    const result: RentalChartPoint[] = [];
+  const rentalsByDate = new Map<string, { label: string; rentals: number }>();
 
-    for (let i = 6; i >= 0; i--) {
-      const date = new Date(today);
-      date.setDate(today.getDate() - i);
+  // Initialize all seven dates with their Map
+  for (let i = 6; i >= 0; i--) {
+    const date = new Date(today);
+    date.setDate(today.getDate() - i);
+    const label = date.toLocaleDateString("en-US", {
+      weekday: "short",
+    });
+    const dateString = [
+      date.getFullYear(),
+      String(date.getMonth() + 1).padStart(2, "0"),
+      String(date.getDate()).padStart(2, "0"),
+    ].join("-");
 
-      const label = date.toLocaleDateString("en-US", {
-        weekday: "short",
-      });
+    rentalsByDate.set(dateString, { label: label, rentals: 0 });
+  }
 
-      const rentalsCount = rentals.filter((rental) => {
-        const rentedDate = new Date(rental.rentedDate);
-
-        return (
-          rentedDate.getFullYear() === date.getFullYear() &&
-          rentedDate.getMonth() === date.getMonth() &&
-          rentedDate.getDate() === date.getDate()
-        );
-      }).length;
-
-      result.push({
-        label,
-        rentals: rentalsCount,
+  for (const rental of rentals) {
+    const day = rentalsByDate.get(rental.rentedDate);
+    if (day) {
+      rentalsByDate.set(rental.rentedDate, {
+        ...day,
+        rentals: day.rentals + 1,
       });
     }
-
-    return result;
   }
-
-  // Last 4 weeks
-  const result: RentalChartPoint[] = [];
-
-  for (let i = 3; i >= 0; i--) {
-    const weekStart = new Date(today);
-    weekStart.setDate(today.getDate() - i * 7 - 6);
-    weekStart.setHours(0, 0, 0, 0);
-
-    const weekEnd = new Date(today);
-    weekEnd.setDate(today.getDate() - i * 7);
-    weekEnd.setHours(23, 59, 59, 999);
-
-    const rentalsCount = rentals.filter((rental) => {
-      const rentedDate = new Date(rental.rentedDate);
-
-      return rentedDate >= weekStart && rentedDate <= weekEnd;
-    }).length;
-
-    result.push({
-      label: `Week ${4 - i}`,
-      rentals: rentalsCount,
-    });
-  }
-
-  return result;
+  return [...rentalsByDate.values()];
 }

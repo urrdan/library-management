@@ -29,7 +29,7 @@ export default function DashBookTable({ books }: { books: Book[] }) {
   ];
 
   return (
-    <div>
+    <div className="my-table">
       <DataTable
         data={books}
         columns={columns}
