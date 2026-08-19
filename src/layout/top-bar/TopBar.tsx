@@ -1,5 +1,4 @@
 import { useLocation } from "react-router-dom";
-import "./top-bar.sass";
 import { RxAvatar } from "react-icons/rx";
 import { ROUTES } from "src/services/appRoutes/routes";
 

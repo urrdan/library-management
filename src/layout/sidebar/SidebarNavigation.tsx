@@ -1,26 +1,61 @@
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink } from "react-router-dom";
+import {
+  LayoutDashboard,
+  BookOpenCheck,
+  BookOpen,
+  Users,
+  UserCog,
+} from "lucide-react";
 
 export default function SidebarNavigation() {
-  const activePath = useLocation().pathname;
-  console.log(useLocation());
   const data = [
-    { label: "Dashboard", path: "/" },
-    { label: "Rentals", path: "/rentals" },
-    { label: "Books", path: "/books" },
-    { label: "Customers", path: "/customers" },
-    { label: "Staff", path: "/staff" },
+    {
+      label: "Dashboard",
+      path: "/dashboard",
+      icon: LayoutDashboard,
+    },
+    {
+      label: "Rentals",
+      path: "/rentals",
+      icon: BookOpenCheck,
+    },
+    {
+      label: "Books",
+      path: "/books",
+      icon: BookOpen,
+    },
+    {
+      label: "Customers",
+      path: "/customers",
+      icon: Users,
+    },
+    {
+      label: "Staff",
+      path: "/staff",
+      icon: UserCog,
+    },
   ];
+
   return (
-    <div className=" sidebar-navs-wrapper">
-      {data.map((nav, index) => (
-        <NavLink
-          to={nav.path}
-          key={index}
-          className={`sidebar-nav ${activePath === nav.path && "active-nav"}`}
-        >
-          {nav.label}
-        </NavLink>
-      ))}
-    </div>
+    <nav className="sidebar-navs-wrapper">
+      {data.map((nav) => {
+        const Icon = nav.icon;
+
+        return (
+          <NavLink
+            to={nav.path}
+            key={nav.path}
+            className={({ isActive }) =>
+              `sidebar-nav ${isActive ? "active-nav" : ""}`
+            }
+            title={nav.label}
+          >
+            <Icon className="sidebar-nav-icon" size={20} />
+
+            <span className="sidebar-text">{nav.label}</span>
+          </NavLink>
+        );
+      })}
+    </nav>
   );
 }
