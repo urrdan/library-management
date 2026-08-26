@@ -6,11 +6,73 @@ import { readStorage, writeStorage } from "../utils/storage-operations";
 import { endpoints, messages } from "../utils/constants";
 import { delay } from "../utils/delay";
 import { CustomError } from "../utils/error";
-import type { RentalEditable } from "src/types/rentalTypes";
+import type {
+  AdminRentalEditable,
+  RentalCreate,
+  RentalStatusFilter,
+} from "src/types/rentalTypes";
 import type { Book } from "src/pages/books/bookTypes";
+import enrichRentals from "../utils/rental-view";
+import getRentalStatus from "../utils/get-rental-status";
 
 const RENTALS_STORAGE_KEY = endpoints.rentals;
 const BOOK_STORAGE_KEY = endpoints.books;
+export async function getEnhancedRentalsController({
+  page = 1,
+  pageSize = 10,
+  status = "all",
+}: {
+  page?: number;
+  pageSize?: number;
+  status?: RentalStatusFilter;
+}) {
+  try {
+    await delay();
+    const rentals = readStorage(RENTALS_STORAGE_KEY);
+
+    // filter
+    let filteredRentals = rentals; //let filteredRentals:Rental[] = [];
+
+    if (status === "all") filteredRentals = rentals;
+    else {
+      filteredRentals = rentals.filter(
+        (rental) => getRentalStatus(rental) === status,
+      );
+    }
+
+    // sort
+    filteredRentals.sort(
+      (a, b) =>
+        new Date(b.rentedDate).getTime() - new Date(a.rentedDate).getTime(),
+    );
+
+    // pagination metadata
+    const totalRecords = filteredRentals.length;
+    const totalPages = Math.ceil(totalRecords / pageSize);
+
+    const startIndex = (page - 1) * pageSize;
+
+    const paginatedRentals = filteredRentals.slice(
+      startIndex,
+      startIndex + pageSize,
+    );
+
+    // enrich only records that will actually be returned
+    const data = enrichRentals(paginatedRentals);
+
+    return {
+      data,
+      pagination: {
+        page,
+        pageSize,
+        totalRecords,
+        totalPages,
+      },
+    };
+  } catch {
+    throw new Error(messages.getError);
+  }
+}
 
 export async function getRentalsController() {
   try {
@@ -22,8 +84,22 @@ export async function getRentalsController() {
   }
 }
 
+export async function getCustomerRentalsController(customerId: string) {
+  try {
+    await delay();
+    const rentals = readStorage(RENTALS_STORAGE_KEY);
+    const customerRentals = rentals.filter(
+      (rental) => rental.customerId === customerId,
+    );
+    const enrichedRentals = enrichRentals(customerRentals);
+    return enrichedRentals;
+  } catch {
+    throw new Error(messages.getError);
+  }
+}
+
 export async function createRentalController(
-  newRental: RentalEditable,
+  newRental: RentalCreate,
 ): Promise<string> {
   try {
     await delay();
@@ -48,7 +124,7 @@ export async function createRentalController(
 
 export async function updateRentalController(
   id: string,
-  updatedFields: RentalEditable,
+  updatedFields: AdminRentalEditable,
 ): Promise<string> {
   try {
     await delay();

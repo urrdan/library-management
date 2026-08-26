@@ -1,46 +1,58 @@
 import { useEffect, useState } from "react";
 import { IoMdAdd } from "react-icons/io";
 import apiWithToast from "src/api/toastifiedApi";
-import { getApi } from "src/api/mockAPI";
 import Loading from "src/components/loading/Loading";
-import MyModal from "src/components/MyModal";
-import MyButton from "src/components/MyButton";
+import MyModal from "src/components/my-modal/MyModal";
+import MyButton from "src/components/my-button/MyButton";
 import RentalTable from "./RentalTable";
 import RentalForm from "./RentalForm";
-
-export type Rental = {
-  id: string;
-  bookId: string;
-  bookTitle: string;
-  customerId: string;
-  customerName: string;
-  staffId: string;
-  staffName: string;
-  rentedDate: string;
-  returnDate: string;
-};
+import { getRentalsAPI } from "src/api/rentalApi";
+import type { RentalStatusFilter, RentalView } from "src/types/rentalTypes";
+import RentalTableFilter from "./rental-filter/RentalFilter";
+import { defaultPageSize } from "src/utils/constants";
 
 export default function Rentals() {
-  const [rentalData, setRentalData] = useState<Rental[]>([]);
+  const [rentalData, setRentalData] = useState<RentalView[]>([]);
   const [loading, setLoading] = useState(true);
 
   const [openNewRental, setOpenNewRental] = useState(false);
 
+  const [status, setStatus] = useState<RentalStatusFilter>("all");
+
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(defaultPageSize);
+  const [pagination, setPagination] = useState({
+    page: page,
+    pageSize: pageSize,
+    totalRecords: 0,
+    totalPages: 0,
+  });
+
   function getRentals() {
-    apiWithToast(getApi("/rentals"))
+    apiWithToast(
+      getRentalsAPI({
+        page,
+        pageSize,
+        status,
+      }),
+    )
       .then((res) => {
-        let data = res.data;
-        data.map((r) => r);
-        console.log(data);
         setRentalData(res.data);
         setLoading(false);
+        if (res.pagination) {
+          setPagination(res.pagination);
+        }
       })
       .catch((err) => console.log(err));
   }
+  const onStatusChange = (newStatus: RentalStatusFilter) => {
+    setStatus(newStatus);
+    setPage(1);
+  };
 
   useEffect(() => {
     getRentals();
-  }, []);
+  }, [page, pageSize, status]);
 
   return (
     <div>
@@ -48,8 +60,9 @@ export default function Rentals() {
         <Loading />
       ) : (
         <>
-          <div className="mb-4 flex justify-between ">
-            <div></div>
+          <div className="mb-4 flex justify-between items-center">
+            <RentalTableFilter value={status} onChange={onStatusChange} />
+
             <MyButton
               icon={<IoMdAdd />}
               title="New Rental"
@@ -58,7 +71,22 @@ export default function Rentals() {
               }}
             />
           </div>
-          <RentalTable rentals={rentalData} getRentals={getRentals} />
+          <RentalTable
+            rentals={rentalData}
+            getRentals={getRentals}
+            hideColumns={["overdueDays"]}
+            paginationTotalRows={pagination.totalRecords}
+            paginationPerPage={pageSize}
+            onChangePage={(page) => {
+              console.log(page);
+              setPage(page);
+            }}
+            onChangeRowsPerPage={(newPageSize) => {
+              console.log(newPageSize);
+              setPageSize(newPageSize);
+              setPage(1);
+            }}
+          />
           {openNewRental && (
             <MyModal
               onClose={() => {

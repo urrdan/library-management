@@ -2,78 +2,102 @@ import { MdClose } from "react-icons/md";
 import { useState } from "react";
 import formValidation from "src/utils/formValidation";
 import apiWithToast from "src/api/toastifiedApi";
-import { postApi, updateApi } from "src/api/mockAPI";
-import type { Rental } from "src/types/types";
-import MyButton from "src/components/MyButton";
+import MyButton from "src/components/my-button/MyButton";
 import BookSearcher from "src/components/searchers/BookSearcher";
-import { MyModalBody, MyModalHead } from "src/components/MyModal";
+import { MyModalBody, MyModalHead } from "src/components/my-modal/MyModal";
 import CustomerSearcher from "src/components/searchers/CustomersSearcher";
 import StaffSearcher from "src/components/searchers/StaffSearcher";
-import MyInput from "src/components/MyInput";
+import MyInput from "src/components/my-input/MyInput";
+import { createRentalAPI, updateRentalAPI } from "src/api/rentalApi";
+import type { RentalCreate, RentalView } from "src/types/rentalTypes";
+import { nameJoiner } from "src/utils/fullNameFormatter";
 
 type CreatingProp = {
   isEditing: false;
   editingRecord?: never;
+  rentalId?: never;
+  isViewing?: never;
 };
 type EditingProp = {
   isEditing: true;
-  editingRecord: Rental;
+  editingRecord: RentalView;
+  rentalId: string;
+  isViewing?: never;
+};
+type ViewProps = {
+  isViewing: true;
+  editingRecord: RentalView;
+  isEditing?: never;
+  rentalId?: never;
+};
+
+type EditableRentalView = Omit<RentalView, "id" | "status">;
+
+const rentalDataTemplate: EditableRentalView = {
+  bookId: "",
+  bookTitle: "",
+  customerId: "",
+  customerName: "",
+  staffId: "",
+  staffName: "",
+  rentedDate: "",
+  dueDate: "",
+  returnedDate: null,
 };
 
 export default function RentalForm({
   editingRecord,
   isEditing,
+  isViewing,
+  rentalId,
   onClose,
   getRentals,
 }: {
   onClose: () => void;
   getRentals: () => void;
-} & (CreatingProp | EditingProp)) {
-  const rentalDataTemplate = {
-    id: "",
-    bookId: "",
-    bookTitle: "",
-    customerId: "",
-    customerName: "",
-    staffId: "",
-    staffName: "",
-    rentedDate: "",
-    returnDate: "",
-  };
-  const fieldsToBeValidated: (keyof Rental)[] = [
-    "bookTitle",
-    "customerName",
-    "staffName",
+} & (CreatingProp | EditingProp | ViewProps)) {
+  const fieldsToBeValidated: (keyof RentalCreate)[] = [
+    "bookId",
+    "customerId",
+    "staffId",
     "rentedDate",
-    "returnDate",
+    "dueDate",
   ];
-  const [stateData, setStateData] = useState<Rental>(
-    isEditing ? editingRecord : rentalDataTemplate,
+
+  const [rentalData, setRentalData] = useState<EditableRentalView>(
+    editingRecord || rentalDataTemplate,
   );
   const [errorData, setErrorData] = useState<
-    Partial<Record<keyof Rental, boolean>>
+    Partial<Record<keyof EditableRentalView, boolean>>
   >({});
 
-  const onChange = <K extends keyof Rental>(propName: K, value: Rental[K]) => {
-    setStateData((prev) => ({ ...prev, [propName]: value }));
+  const onChange = <K extends keyof EditableRentalView>(
+    propName: K,
+    value: EditableRentalView[K],
+  ) => {
+    setRentalData((prev) => ({ ...prev, [propName]: value }));
     setErrorData((prev) => {
-      if (prev[propName] === true) return { ...prev, [propName]: true };
+      if (prev[propName] === true) return { ...prev, [propName]: false };
       return prev;
     });
   };
 
   const onSave = () => {
     const { hasError, errorObj } = formValidation(
-      stateData,
+      rentalData,
       fieldsToBeValidated,
     );
     setErrorData(errorObj);
-    console.log(stateData);
+    console.log(rentalData);
     if (hasError) return;
 
+    const { customerName, staffName, bookTitle, ...adminEditRental } =
+      rentalData;
+    const { returnedDate, ...creatableRental } = adminEditRental;
+
     const apiPromise = isEditing
-      ? apiWithToast(updateApi("/rentals", editingRecord.id, stateData))
-      : apiWithToast(postApi("/rentals", stateData));
+      ? apiWithToast(updateRentalAPI(adminEditRental, rentalId))
+      : apiWithToast(createRentalAPI(creatableRental));
 
     apiPromise
       .then(() => {
@@ -87,10 +111,16 @@ export default function RentalForm({
     <>
       <MyModalHead>
         <div>
-          <h4>{isEditing ? "Edit Rental Info" : "Create New Rental"}</h4>
+          <h4>
+            {isEditing
+              ? "Edit Rental Info"
+              : isViewing
+                ? "View Rental Info"
+                : "Create New Rental"}
+          </h4>
         </div>
         <div className="flex">
-          <MyButton title="Save" onClick={onSave} />
+          {!isViewing && <MyButton title="Save" onClick={onSave} />}
           <MdClose
             className="ml-2 link-like text-3xl text-gray-500"
             onClick={onClose}
@@ -101,46 +131,61 @@ export default function RentalForm({
       <MyModalBody>
         <div className="grid grid-cols-2 gap-4 gap-x-6">
           <BookSearcher
-            value={stateData.bookTitle}
+            value={rentalData.bookTitle}
             onSelect={(selectedBook) => {
               onChange("bookTitle", selectedBook.title);
               onChange("bookId", selectedBook.id);
             }}
-            error={errorData.bookTitle}
+            error={errorData.bookId}
+            disabled={isViewing}
           />
           <CustomerSearcher
-            value={stateData.customerName}
+            value={rentalData.customerName}
             onSelect={(selectedCustomer) => {
-              onChange("customerName", selectedCustomer.customerName);
-              onChange("customerId", selectedCustomer.customerId);
+              const name = nameJoiner(selectedCustomer);
+              onChange("customerName", name);
+              onChange("customerId", selectedCustomer.id);
             }}
-            error={errorData.customerName}
+            error={errorData.customerId}
+            disabled={isViewing}
           />
 
           <StaffSearcher
-            value={stateData.staffName}
+            value={rentalData.staffName}
             onSelect={(selectedStaff) => {
-              onChange("staffName", selectedStaff.staffName);
-              onChange("staffId", selectedStaff.staffId);
+              onChange("staffName", nameJoiner(selectedStaff));
+              onChange("staffId", selectedStaff.id);
             }}
-            error={errorData.staffName}
+            error={errorData.staffId}
+            disabled={isViewing}
           />
 
           <MyInput
             label="Rented Date"
             type="date"
-            value={stateData.rentedDate}
+            value={rentalData.rentedDate}
             onChange={(value) => onChange("rentedDate", value)}
             error={errorData.rentedDate}
+            disabled={isViewing}
           />
 
           <MyInput
-            label="Return Date"
+            label="Due Date"
             type="date"
-            value={stateData.returnDate}
-            onChange={(value) => onChange("returnDate", value)}
-            error={errorData.returnDate}
+            value={rentalData.dueDate}
+            onChange={(value) => onChange("dueDate", value)}
+            error={errorData.dueDate}
+            disabled={isViewing}
           />
+          {isViewing && editingRecord.returnedDate && (
+            <MyInput
+              label="Returned Date"
+              type="date"
+              value={editingRecord.returnedDate || ""}
+              onChange={() => {}}
+              disabled
+            />
+          )}
         </div>
       </MyModalBody>
     </>

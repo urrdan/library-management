@@ -1,24 +1,41 @@
 import {
   createRentalController,
   deleteRentalController,
-  getRentalsController,
+  getEnhancedRentalsController,
   returnRentalController,
   undoReturnRentalController,
   updateRentalController,
 } from "src/backend-mock/controllers/rentalsController";
 import type { SuccessResponse } from "src/types/apiTypes";
-import type { RentalEditable, Rental } from "src/types/rentalTypes";
+import type {
+  AdminRentalEditable,
+  RentalCreate,
+  RentalStatusFilter,
+  RentalView,
+} from "src/types/rentalTypes";
 
-export async function getRentalsAPI(): Promise<SuccessResponse<Rental[]>> {
+export async function getRentalsAPI({
+  page,
+  pageSize,
+  status,
+}: {
+  page?: number;
+  pageSize?: number;
+  status?: RentalStatusFilter;
+}): Promise<SuccessResponse<RentalView[]>> {
   try {
-    let result = await getRentalsController();
-    return { data: result, message: null };
+    let result = await getEnhancedRentalsController({ page, pageSize, status });
+    return {
+      data: result.data,
+      message: null,
+      pagination: result.pagination,
+    };
   } catch (error) {
     throw error;
   }
 }
 
-export async function createRentalAPI(newRental: RentalEditable) {
+export async function createRentalAPI(newRental: RentalCreate) {
   try {
     let result = await createRentalController(newRental);
     return { data: result, message: result };
@@ -28,7 +45,7 @@ export async function createRentalAPI(newRental: RentalEditable) {
 }
 
 export async function updateRentalAPI(
-  editedRental: RentalEditable,
+  editedRental: AdminRentalEditable,
   id: string,
 ) {
   try {
