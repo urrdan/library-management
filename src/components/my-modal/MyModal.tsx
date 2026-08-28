@@ -1,5 +1,6 @@
 import type { JSX } from "react/jsx-runtime";
 import "./MyModal.sass";
+import { createPortal } from "react-dom";
 
 type Props = {
   children: string | JSX.Element | JSX.Element[] /* | (() => JSX.Element) */;
@@ -7,7 +8,7 @@ type Props = {
 };
 
 export default function MyModal({ children, onClose }: Props) {
-  return (
+  return createPortal(
     <div className=" my-modal" onClick={onClose}>
       <div
         className="my-modal-content"
@@ -17,7 +18,8 @@ export default function MyModal({ children, onClose }: Props) {
       >
         {children}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 
