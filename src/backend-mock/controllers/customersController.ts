@@ -9,9 +9,13 @@ import { delay } from "../utils/delay";
 import type {
   CustomerSystemFields,
   CustomerProfile,
+  CustomerStatus,
+  CustomerStatusFilter,
 } from "src/types/customerTypes";
-import { NotFoundError } from "../utils/error";
+import { CustomError } from "../utils/error";
 import dateUtil from "src/utils/dateUtil";
+import { enrichCustomers } from "../utils/enrichData";
+import { defaultPageSize } from "src/utils/constants";
 
 const CUSTOMERS_STORAGE_KEY = endpoints.customers;
 
@@ -23,6 +27,58 @@ export async function getCustomersController() {
   } catch (err) {
     console.log(err);
 
+    throw new Error(messages.getError);
+  }
+}
+
+export async function getEnrichedCustomersController({
+  page = 1,
+  pageSize = defaultPageSize,
+  status = "all",
+}: {
+  page?: number;
+  pageSize?: number;
+  status?: CustomerStatusFilter;
+}) {
+  try {
+    await delay();
+
+    const customers = readStorage(CUSTOMERS_STORAGE_KEY);
+
+    // filter
+    let filteredCustomers = customers.filter(
+      (customer) => customer.status !== "deleted",
+    );
+
+    if (status !== "all") {
+      filteredCustomers = filteredCustomers.filter(
+        (customer) => customer.status === status,
+      );
+    }
+
+    // pagination metadata
+    const totalRecords = filteredCustomers.length;
+    const totalPages = Math.ceil(totalRecords / pageSize);
+
+    const startIndex = (page - 1) * pageSize;
+
+    const paginatedCustomers = filteredCustomers.slice(
+      startIndex,
+      startIndex + pageSize,
+    );
+
+    // enrich only records actually returned
+    const data = enrichCustomers(paginatedCustomers);
+    return {
+      data,
+      pagination: {
+        page,
+        pageSize,
+        totalRecords,
+        totalPages,
+      },
+    };
+  } catch {
     throw new Error(messages.getError);
   }
 }
@@ -55,7 +111,7 @@ export async function updateCustomerController(
     const customers = readStorage(CUSTOMERS_STORAGE_KEY);
 
     if (!checkRecordExists(customers, id)) {
-      throw new NotFoundError(messages.notFound);
+      throw new CustomError(messages.notFound);
     }
     const updatedCustomers = updateRecordOperation(
       customers,
@@ -65,7 +121,38 @@ export async function updateCustomerController(
     writeStorage(CUSTOMERS_STORAGE_KEY, updatedCustomers);
     return messages.updateSuccess;
   } catch (error) {
-    throw error;
+    if (error instanceof CustomError) {
+      throw error; // business error
+    }
+    throw new Error(messages.updateError); //unexpected error
+  }
+}
+
+export async function updateCustomerStatusController(
+  customerId: string,
+  status: Extract<CustomerStatus, "active" | "suspended">,
+) {
+  try {
+    await delay();
+
+    const customers = readStorage(CUSTOMERS_STORAGE_KEY);
+    const customer = customers.find((x) => x.id === customerId);
+    if (!customer) {
+      throw new CustomError(messages.notFound);
+    }
+    if (customer.status === status) {
+      throw new CustomError(`Customer is already ${status}`);
+    }
+    const updatedCustomers = updateRecordOperation(customers, customerId, {
+      status,
+    });
+    writeStorage(CUSTOMERS_STORAGE_KEY, updatedCustomers);
+    return messages.updateSuccess;
+  } catch (error) {
+    if (error instanceof CustomError) {
+      throw error;
+    }
+    throw new Error(messages.updateError);
   }
 }
 
@@ -73,13 +160,20 @@ export async function deleteCustomerController(id: string) {
   try {
     await delay();
     const customers = readStorage(CUSTOMERS_STORAGE_KEY);
-    if (!checkRecordExists(customers, id))
-      throw new NotFoundError(messages.notFound);
-    const updatedCustomers = customers.filter((customer) => customer.id !== id);
+    const customer = customers.find((customer) => customer.id === id);
+    if (!customer) {
+      throw new CustomError(messages.notFound);
+    }
+    if (customer.status === "deleted") {
+      throw new CustomError("Customer is already deleted");
+    }
+    const updatedCustomers = updateRecordOperation(customers, id, {
+      status: "deleted",
+    });
     writeStorage(CUSTOMERS_STORAGE_KEY, updatedCustomers);
     return messages.deleteSuccess;
   } catch (error) {
-    if (error instanceof NotFoundError) {
+    if (error instanceof CustomError) {
       throw error;
     }
     throw new Error(messages.deleteError);

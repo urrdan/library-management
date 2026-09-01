@@ -1,15 +1,50 @@
 import {
   createCustomerController,
   deleteCustomerController,
-  getCustomersController,
+  getEnrichedCustomersController,
   updateCustomerController,
+  updateCustomerStatusController,
 } from "src/backend-mock/controllers/customersController";
+import { getCustomerRentalsController } from "src/backend-mock/controllers/rentalsController";
 import type { SuccessResponse } from "src/types/apiTypes";
-import type { Customer, CustomerProfile } from "src/types/customerTypes";
+import type {
+  Customer,
+  CustomerProfile,
+  CustomerStatus,
+  CustomerStatusFilter,
+} from "src/types/customerTypes";
+import type { RentalView } from "src/types/rentalTypes";
 
-export async function getCustomersAPI(): Promise<SuccessResponse<Customer[]>> {
+export async function getCustomersAPI({
+  page,
+  pageSize,
+  status,
+}: {
+  page?: number;
+  pageSize?: number;
+  status?: CustomerStatusFilter;
+}): Promise<SuccessResponse<Customer[]>> {
   try {
-    let result = await getCustomersController();
+    let result = await getEnrichedCustomersController({
+      page,
+      pageSize,
+      status,
+    });
+    return {
+      data: result.data,
+      message: null,
+      pagination: result.pagination,
+    };
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function getCustomerRentalsAPI(
+  customerId: string,
+): Promise<SuccessResponse<RentalView[]>> {
+  try {
+    let result = await getCustomerRentalsController(customerId);
     return { data: result, message: null };
   } catch (error) {
     throw error;
@@ -31,6 +66,18 @@ export async function updateCustomerAPI(
 ) {
   try {
     let result = await updateCustomerController(id, newcustomer);
+    return { data: result, message: result };
+  } catch (err) {
+    throw err;
+  }
+}
+
+export async function updateCustomerStatusAPI(
+  customerId: string,
+  status: Extract<CustomerStatus, "active" | "suspended">,
+) {
+  try {
+    let result = await updateCustomerStatusController(customerId, status);
     return { data: result, message: result };
   } catch (err) {
     throw err;

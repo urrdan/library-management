@@ -1,4 +1,5 @@
-export type CustomerStatus = "active" | "suspended";
+export type CustomerStatus = "active" | "suspended" | "deleted";
+export type CustomerStatusFilter = CustomerStatus | "all";
 
 export type Customer = {
   id: string;
