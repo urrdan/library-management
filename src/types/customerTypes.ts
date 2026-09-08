@@ -17,3 +17,15 @@ export type CustomerProfile = {
   email: string;
   phone: string;
 };
+export type CustomerRentalCounts = {
+  all: number;
+  active: number;
+  overdue: number;
+  returned: number;
+};
+export const customerRentalCounts = {
+  all: 0,
+  active: 0,
+  overdue: 0,
+  returned: 0,
+};

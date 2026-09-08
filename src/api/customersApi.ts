@@ -13,7 +13,7 @@ import type {
   CustomerStatus,
   CustomerStatusFilter,
 } from "src/types/customerTypes";
-import type { RentalView } from "src/types/rentalTypes";
+import type { RentalStatusFilter, RentalView } from "src/types/rentalTypes";
 
 export async function getCustomersAPI({
   page,
@@ -42,9 +42,15 @@ export async function getCustomersAPI({
 
 export async function getCustomerRentalsAPI(
   customerId: string,
-): Promise<SuccessResponse<RentalView[]>> {
+  status: RentalStatusFilter,
+): Promise<
+  SuccessResponse<{
+    data: RentalView[];
+    counts: { all: number; active: number; overdue: number; returned: number };
+  }>
+> {
   try {
-    let result = await getCustomerRentalsController(customerId);
+    let result = await getCustomerRentalsController(customerId, status);
     return { data: result, message: null };
   } catch (error) {
     throw error;

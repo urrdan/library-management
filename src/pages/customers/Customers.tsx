@@ -8,6 +8,7 @@ import { IoMdAdd } from "react-icons/io";
 import CustomersTable from "./CustomersTable";
 import CreateCustomerModal from "./customer-modals/CreateCustomerModal";
 import { defaultPageSize } from "src/utils/constants";
+import TableFilter from "src/components/table-filter/TableFilters";
 
 export default function Customers() {
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -55,6 +56,18 @@ export default function Customers() {
       ) : (
         <>
           <div className="mb-4 flex justify-between items-center gap-4">
+            <TableFilter
+              value={status}
+              onChange={(status: CustomerStatusFilter) => {
+                setStatus(status);
+                resetPagination();
+              }}
+              filters={[
+                { label: "All", value: "all" },
+                { label: "Active", value: "active" },
+                { label: "Suspended", value: "suspended" },
+              ]}
+            />
             <MyButton
               icon={<IoMdAdd />}
               title="New Customer"

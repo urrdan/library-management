@@ -1,0 +1,80 @@
+.history-head 
+  display: flex
+  align-items: center
+  justify-content: space-between
+  padding: 1rem 0 1.5rem
+  gap: 2rem
+
+  .history-filter 
+    display: flex
+    align-items: center
+    gap: 1.25rem
+
+    button 
+      position: relative
+      display: flex
+      flex-direction: column
+      align-items: center
+      gap: 0.25rem
+      min-width: 4rem
+      padding: 0.5rem 0.75rem
+      border: none
+      border-radius: 0.5rem
+      background: transparent
+      color: var(--color-text-muted)
+      font: inherit
+      cursor: pointer
+      transition: background 0.15s ease
+
+      &:hover 
+        background: var(--color-status-info-bg)
+  
+      &.selected 
+        background: var(--color-status-info-bg)
+    
+    .filter-count 
+      font-size: 1.25rem
+      font-weight: 700
+      line-height: 1
+
+      &.active-count 
+        color: var(--color-status-info) 
+
+      &.overdue-count
+        color: var(--color-status-danger)
+      
+      &.returned-count 
+        color: var(--color-status-success)
+      
+    > i 
+      width: 1px
+      height: 2.75rem
+      background: var(--color-surface-alternative)
+    
+  .customer-info 
+    display: flex
+    align-items: center
+    gap: 0.75rem
+
+    .initials 
+      display: flex
+      align-items: center
+      justify-content: center
+      width: 3.5rem
+      height: 3.5rem
+      flex-shrink: 0
+      border-radius: 50%
+      background: var(--color-surface-alternative)
+      font-size: 1.15rem
+      font-weight: 600
+    
+    h5 
+      margin: 0 0 0.2rem
+      font-size: 1rem
+      font-weight: 600
+
+    p 
+      margin: 0
+      font-size: 0.9rem
+    
+  

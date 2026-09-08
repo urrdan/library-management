@@ -13,7 +13,7 @@ import { BiLinkExternal } from "react-icons/bi";
 import { defaultPaginationOptions } from "src/utils/constants";
 import TableActionMenu from "src/components/table-action-menu/TableActionMenu";
 import { FiEdit } from "react-icons/fi";
-import CustomerRentalsModal from "./customer-modals/CustomerRentalsModal";
+import CustomerRentalHistory from "./customer-modals/rental-history/CustomerRentalHistory";
 import type { StatusBadgeType } from "src/components/status-badge/StatusBadge";
 import StatusBadge from "src/components/status-badge/StatusBadge";
 import EditCustomerModal from "./customer-modals/EditCustomerModal";
@@ -239,7 +239,7 @@ export default function CustomersTable({
       )}
 
       {openViewModal && selectedCustomer && (
-        <CustomerRentalsModal
+        <CustomerRentalHistory
           customer={selectedCustomer}
           onClose={() => {
             setOpenViewModal(false);
