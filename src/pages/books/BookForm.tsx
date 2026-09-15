@@ -1,11 +1,14 @@
 import { MdClose } from "react-icons/md";
-import MyButton from "../../components/MyButton";
-import MyInput from "../../components/MyInput";
-import MyModal, { MyModalBody, MyModalHead } from "../../components/MyModal";
+import MyButton from "../../components/my-button/MyButton";
+import MyInput from "../../components/my-input/MyInput";
+import MyModal, {
+  MyModalBody,
+  MyModalHead,
+} from "../../components/my-modal/MyModal";
 import { useState } from "react";
 import apiWithToast from "src/api/toastifiedApi";
-import { postApi, updateApi } from "src/api/mockAPI";
-import type { Book, BookInputForm } from "./bookTypes";
+import { createBookAPI, updateBookAPI } from "src/api/booksApi";
+import type { Book, BookInputForm } from "src/types/bookTypes";
 
 const bookTemplate = {
   title: "",
@@ -107,8 +110,8 @@ export default function BookForm(props: BookFormProps) {
     if (hasError) return;
 
     const apiPromise = isEditing
-      ? apiWithToast(updateApi("/books", selectedBook.id, dataToSubmit))
-      : apiWithToast(postApi("/books", dataToSubmit));
+      ? apiWithToast(updateBookAPI(dataToSubmit, selectedBook.id))
+      : apiWithToast(createBookAPI(dataToSubmit));
 
     apiPromise
       .then((res) => {
