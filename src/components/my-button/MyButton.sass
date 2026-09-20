@@ -2,15 +2,27 @@
     display: flex 
     align-items: center
     background: var(--color-button-bg)
-    color: var(--color-text-light)
+    color: var(--color-text-alternative)
     border-radius: var(--spacing-sm)
     padding: var(--spacing-xs) calc(var(--spacing-md)*1.25)
     font-size: 1rem
+    
+    &:hover
+        opacity: 0.7
+        cursor: pointer
     &.sm
         padding: calc(var(--spacing-sm)/2) var(--spacing-xs) 
         font-size: 0.85rem  
     &-icon
         margin-right: var(--spacing-sm)
-        font-size: 1.125rem 
+        >*
+            width: 14px
+            height: 18px
+        &.icon-right
+            margin: 0
+            margin-left: var(--spacing-sm)
 
-
+    &.link
+        background: none
+        color: var(--color-text-link)
+        font-weight: 500
