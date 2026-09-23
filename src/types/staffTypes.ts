@@ -15,3 +15,5 @@ export type StaffProfile = {
   email: string;
   phone: string;
 };
+
+export type StaffStatusFilter = StaffRole | "all";

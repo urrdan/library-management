@@ -3,39 +3,73 @@ import StaffsTable from "./StaffTable";
 import apiWithToast from "src/api/toastifiedApi";
 import { getStaffsAPI } from "src/api/staffApi";
 import Loading from "src/components/loading/Loading";
-import type { Staff } from "src/types/staffTypes";
+import type { Staff, StaffStatusFilter } from "src/types/staffTypes";
 import StaffForm from "./StaffForm";
-import MyButton from "src/components/MyButton";
+import MyButton from "src/components/my-button/MyButton";
 import { IoMdAdd } from "react-icons/io";
+import { DEFAULT_PAGE_SIZE } from "src/utils/constants";
+import TableFilter from "src/components/table-filter/TableFilters";
 
 export default function Staff() {
   const [staffs, setStaffs] = useState<Staff[]>([]);
+
+  const [status, setStatus] = useState<StaffStatusFilter>("all");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
+  const [pagination, setPagination] = useState({
+    page: page,
+    pageSize: pageSize,
+    totalRecords: 0,
+    totalPages: 0,
+  });
+
+  const [resetPaginationToggle, setResetPaginationToggle] = useState(false);
+
+  const resetPagination = () => {
+    setPage(1);
+    setResetPaginationToggle((prev) => !prev);
+  };
   const [openModal, setOpenModal] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [tableLoading, setTableLoading] = useState(true);
 
   function getStaffs() {
-    apiWithToast(getStaffsAPI())
+    setTableLoading(true);
+    apiWithToast(getStaffsAPI({ page, pageSize, status }))
       .then((res) => {
-        let data = res.data;
-        data.map((r) => r);
-        console.log(data[0]);
         setStaffs(res.data);
-        setLoading(false);
+        if (res.pagination) {
+          setPagination(res.pagination);
+        }
       })
-      .catch((err) => console.log(err));
+      .finally(() => {
+        setInitialLoading(false);
+        setTableLoading(false);
+      });
   }
 
   useEffect(() => {
     getStaffs();
-  }, []);
+  }, [page, pageSize, status]);
   return (
     <>
-      {loading ? (
+      {initialLoading ? (
         <Loading />
       ) : (
         <>
-          <div className="mb-4 flex justify-end ">
-            <div></div>
+          <div className="mb-4 flex justify-between items-center gap-4">
+            <TableFilter
+              value={status}
+              onChange={(status: StaffStatusFilter) => {
+                setStatus(status);
+                resetPagination();
+              }}
+              filters={[
+                { label: "All", value: "all" },
+                { label: "Librarian", value: "librarian" },
+                { label: "Admin", value: "admin" },
+              ]}
+            />
             <MyButton
               icon={<IoMdAdd />}
               title="New Staff"
@@ -44,7 +78,22 @@ export default function Staff() {
               }}
             />
           </div>
-          <StaffsTable staffs={staffs} getStaffs={getStaffs} />
+
+          <StaffsTable
+            staffs={staffs}
+            getStaffs={getStaffs}
+            paginationTotalRows={pagination.totalRecords}
+            paginationPerPage={pageSize}
+            onChangePage={(page) => {
+              setPage(page);
+            }}
+            onChangeRowsPerPage={(newPageSize) => {
+              setPageSize(newPageSize);
+              resetPagination();
+            }}
+            resetDefaultPage={resetPaginationToggle}
+            tableLoading={tableLoading}
+          />
           {openModal && (
             <StaffForm
               onClose={() => {

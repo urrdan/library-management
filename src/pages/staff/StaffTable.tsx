@@ -5,17 +5,36 @@ import { RiDeleteBin2Line } from "react-icons/ri";
 import { deleteStaffAPI } from "src/api/staffApi";
 import apiWithToast from "src/api/toastifiedApi";
 import { useState } from "react";
-import ConfirmationModal from "src/components/ConfirmationModal";
+import ConfirmationModal from "src/components/my-modal/ConfirmationModal";
 import StaffForm from "./StaffForm";
-import { BiLinkExternal } from "react-icons/bi";
-import { mainPagination } from "src/utils/constants";
+import {
+  DEFAULT_PAGE_SIZE,
+  DEFAULT_PAGINATION_OPTIONS,
+} from "src/utils/constants";
+import { FiEdit } from "react-icons/fi";
+import Loading from "src/components/loading/Loading";
+import type { StatusBadgeType } from "src/components/status-badge/StatusBadge";
+import StatusBadge from "src/components/status-badge/StatusBadge";
 
 export default function StaffsTable({
   staffs,
   getStaffs,
+  paginationTotalRows,
+  paginationPerPage = DEFAULT_PAGE_SIZE,
+  onChangePage,
+  onChangeRowsPerPage,
+  resetDefaultPage,
+  tableLoading,
 }: {
   staffs: Staff[];
   getStaffs: () => void;
+
+  paginationTotalRows?: number;
+  paginationPerPage?: number;
+  onChangePage?: (page: number) => void;
+  onChangeRowsPerPage?: (rowsPerPage: number) => void;
+  resetDefaultPage?: boolean;
+  tableLoading?: boolean;
 }) {
   const [openEditModal, setOpenEditModal] = useState(false);
   const [selectedStaff, setSelectedStaff] = useState<null | Staff>(null);
@@ -32,6 +51,35 @@ export default function StaffsTable({
         setOpenDelete(false);
       })
       .catch((res) => console.log(res.message));
+  };
+
+  const customeStyles = {
+    progress: {
+      style: {
+        backgroundColor: "transparent",
+      },
+    },
+  };
+
+  const setupStatus = (row: Staff) => {
+    const status = row.role;
+    const statusMap: Record<
+      Staff["role"],
+      { title: string; status: StatusBadgeType }
+    > = {
+      admin: {
+        title: "Admin",
+        status: "success",
+      },
+      librarian: {
+        title: "Librarian",
+        status: "info",
+      },
+    };
+
+    const currentStatus = statusMap[status];
+
+    return StatusBadge(currentStatus);
   };
   const columns: TableColumn<Staff>[] = [
     {
@@ -51,18 +99,19 @@ export default function StaffsTable({
     {
       name: "Email",
       selector: (row) => row.email,
-      grow: 2,
+      grow: 3,
     },
     {
       name: "Role",
       selector: (row) => row.role,
+      cell: (row) => setupStatus(row),
     },
     {
       name: "Actions",
       cell: (row) => {
         return (
           <div className="flex justify-around text-2xl">
-            <BiLinkExternal
+            <FiEdit
               className="link-like mr-3"
               onClick={() => {
                 setSelectedStaff(row);
@@ -80,6 +129,7 @@ export default function StaffsTable({
         );
       },
       sortable: true,
+      right: true,
     },
   ];
 
@@ -89,8 +139,16 @@ export default function StaffsTable({
         data={staffs}
         columns={columns}
         pagination
-        paginationPerPage={10}
-        paginationRowsPerPageOptions={mainPagination}
+        paginationTotalRows={paginationTotalRows}
+        paginationPerPage={paginationPerPage}
+        onChangePage={onChangePage}
+        paginationServer
+        onChangeRowsPerPage={onChangeRowsPerPage}
+        paginationRowsPerPageOptions={DEFAULT_PAGINATION_OPTIONS}
+        paginationResetDefaultPage={resetDefaultPage}
+        progressPending={tableLoading}
+        progressComponent={<Loading />}
+        customStyles={customeStyles}
       />
       {openDelete && recordToBeDeleted && (
         <ConfirmationModal

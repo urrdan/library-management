@@ -1,7 +1,10 @@
 import { MdClose } from "react-icons/md";
-import MyButton from "../../components/MyButton";
-import MyInput from "../../components/MyInput";
-import MyModal, { MyModalBody, MyModalHead } from "../../components/MyModal";
+import MyButton from "../../components/my-button/MyButton";
+import MyInput from "../../components/my-input/MyInput";
+import MyModal, {
+  MyModalBody,
+  MyModalHead,
+} from "../../components/my-modal/MyModal";
 import { useState } from "react";
 import apiWithToast from "src/api/toastifiedApi";
 import { createStaffAPI, updateStaffAPI } from "src/api/staffApi";

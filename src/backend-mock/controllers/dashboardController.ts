@@ -11,7 +11,7 @@ import type {
   DashboardKPIs,
   RentalChartPoint,
 } from "src/types/dashboardTypes";
-import { lowBookStockThreshold } from "src/utils/constants";
+import { LOW_BOOK_STOCK_THRESHOLD } from "src/utils/constants";
 
 const BOOK_STORAGE_KEY = endpoints.books;
 const RENTAL_STORAGE_KEY = endpoints.rentals;
@@ -71,7 +71,7 @@ function buildKPIs(
 
 function buildRunningLowBooks(books: Book[]): Book[] {
   return books
-    .filter((book) => book.availableCopies <= lowBookStockThreshold)
+    .filter((book) => book.availableCopies <= LOW_BOOK_STOCK_THRESHOLD)
     .sort((a, b) => a.availableCopies - b.availableCopies)
     .slice(0, recordLimit);
 }
