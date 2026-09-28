@@ -1,36 +1,28 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import MySearchInput from "./MySearchInput";
 import type { Book } from "src/pages/books/bookTypes";
-import { getBooksAPI } from "src/api/booksApi";
+import { searchBooksAPI } from "src/api/booksApi";
 
 export default function BookSearcher({
   value,
   onSelect,
   label = "Book",
   error,
+  disabled = false,
 }: {
   value: string;
   onSelect: (selectedBook: Book) => void;
   label?: string;
   error?: boolean;
+  disabled?: boolean;
 }) {
   const [searchResult, setSearchResult] = useState<Book[]>([]);
-  const [books, setBooks] = useState<Book[]>([]);
 
-  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.target;
-    let filteredResult: Book[] = [];
-    if (value)
-      filteredResult = books.filter((x) =>
-        x.title.toLocaleLowerCase().includes(value),
-      );
-
-    setSearchResult(filteredResult);
+  const searchBooks = (query: string) => {
+    searchBooksAPI({ query: query }).then((res) => {
+      setSearchResult(res.data);
+    });
   };
-
-  useEffect(() => {
-    getBooksAPI().then((res) => setBooks(res.data));
-  }, []);
 
   const resultStructure = () => {
     return (
@@ -38,8 +30,9 @@ export default function BookSearcher({
         {searchResult.map((item, index) => (
           <div
             key={index}
-            onClick={() => {
+            onMouseDown={() => {
               onSelect(item);
+              setSearchResult([]);
             }}
             className="px-2 my-2 link-like"
           >
@@ -56,10 +49,11 @@ export default function BookSearcher({
   return (
     <MySearchInput
       label={label}
-      onChange={onChange}
+      onSearch={searchBooks}
       resultStructure={resultStructure}
       value={value}
       error={error}
+      disabled={disabled}
     />
   );
 }

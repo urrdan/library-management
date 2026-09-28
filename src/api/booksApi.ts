@@ -2,6 +2,7 @@ import {
   createBookController,
   deleteBookController,
   getBooksController,
+  searchBooksController,
   updateBookController,
 } from "src/backend-mock/controllers/booksController";
 import type { SuccessResponse } from "src/types/apiTypes";
@@ -23,6 +24,21 @@ export async function getBooksAPI({
       message: null,
       pagination: result.pagination,
     };
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function searchBooksAPI({
+  query,
+  limit,
+}: {
+  query: string;
+  limit?: number;
+}) {
+  try {
+    const result = await searchBooksController({ query, limit });
+    return { data: result, message: null };
   } catch (error) {
     throw error;
   }

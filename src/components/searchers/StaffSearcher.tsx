@@ -1,65 +1,59 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import MySearchInput from "./MySearchInput";
-import { getStaffsAPI } from "src/api/staffApi";
 import type { Staff } from "src/types/staffTypes";
-import { nameJoiner } from "src/utils/fullNameFormatter";
+import { nameJoiner } from "src/utils/stringUtils";
+import { searchStaffAPI } from "src/api/staffApi";
 
 export default function StaffSearcher({
   value,
   onSelect,
   label = "Staff",
   error,
+  disabled = false,
 }: {
   value: string;
-  onSelect: (selectedStaff: Staff) => void;
+  onSelect: (staff: Staff) => void;
   label?: string;
   error?: boolean;
+  disabled?: boolean;
 }) {
   const [searchResult, setSearchResult] = useState<Staff[]>([]);
-  const [data, setData] = useState<Staff[]>([]);
-  const getData = () => {
-    getStaffsAPI().then((res) => {
-      console.log(res.data);
-      setData(res.data);
-    });
-  };
-  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.target;
-    let filteredResult: Staff[] = [];
-    if (value)
-      filteredResult = data.filter((x) => {
-        const name = nameJoiner(x);
-        return name.toLocaleLowerCase().includes(value);
-      });
 
-    setSearchResult(filteredResult);
+  const searchStaff = (query: string) => {
+    searchStaffAPI({ query }).then((res) => {
+      setSearchResult(res.data);
+    });
   };
 
   const resultStructure = () => {
     return (
       <>
-        {searchResult.map((item, index) => (
+        {searchResult.map((staff) => (
           <div
-            key={index}
-            onClick={() => {
-              onSelect(item);
+            key={staff.id}
+            onMouseDown={() => {
+              onSelect(staff);
+              setSearchResult([]);
             }}
             className="px-2 my-2 link-like"
           >
-            {nameJoiner(item)}
+            <div>{nameJoiner(staff)}</div>
+
+            <hr className="mt-2 mb-3 text-gray-200" />
           </div>
         ))}
       </>
     );
   };
-  useEffect(getData, []);
+
   return (
     <MySearchInput
       label={label}
-      onChange={onChange}
-      resultStructure={resultStructure}
       value={value}
+      onSearch={searchStaff}
+      resultStructure={resultStructure}
       error={error}
+      disabled={disabled}
     />
   );
 }

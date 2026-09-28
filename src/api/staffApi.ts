@@ -2,14 +2,42 @@ import {
   createStaffController,
   deleteStaffController,
   getStaffController,
+  searchStaffController,
   updateStaffController,
 } from "src/backend-mock/controllers/staffController";
 import type { SuccessResponse } from "src/types/apiTypes";
-import type { Staff, StaffProfile } from "src/types/staffTypes";
+import type {
+  Staff,
+  StaffProfile,
+  StaffStatusFilter,
+} from "src/types/staffTypes";
 
-export async function getStaffsAPI(): Promise<SuccessResponse<Staff[]>> {
+export async function getStaffsAPI({
+  page,
+  pageSize,
+  status,
+}: {
+  page?: number;
+  pageSize?: number;
+  status?: StaffStatusFilter;
+}): Promise<SuccessResponse<Staff[]>> {
   try {
-    let result = await getStaffController();
+    const result = await getStaffController({ page, pageSize, status });
+    return { data: result.data, pagination: result.pagination, message: null };
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function searchStaffAPI({
+  query,
+  limit,
+}: {
+  query: string;
+  limit?: number;
+}): Promise<SuccessResponse<Staff[]>> {
+  try {
+    let result = await searchStaffController({ query, limit });
     return { data: result, message: null };
   } catch (error) {
     throw error;

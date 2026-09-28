@@ -2,6 +2,7 @@ import {
   createCustomerController,
   deleteCustomerController,
   getEnrichedCustomersController,
+  searchCustomersController,
   updateCustomerController,
   updateCustomerStatusController,
 } from "src/backend-mock/controllers/customersController";
@@ -35,6 +36,21 @@ export async function getCustomersAPI({
       message: null,
       pagination: result.pagination,
     };
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function searchCustomersAPI({
+  query,
+  limit,
+}: {
+  query: string;
+  limit?: number;
+}) {
+  try {
+    const result = await searchCustomersController({ query, limit });
+    return { data: result, message: null };
   } catch (error) {
     throw error;
   }

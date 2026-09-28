@@ -14,26 +14,15 @@ import type {
 } from "src/types/customerTypes";
 import { CustomError } from "../utils/error";
 import dateUtil from "src/utils/dateUtil";
-import { enrichCustomers } from "../utils/enrichData";
-import { defaultPageSize } from "src/utils/constants";
+import { DEFAULT_PAGE_SIZE } from "src/utils/constants";
+import enrichCustomersData from "../utils/enrichCustomerData";
+import { nameJoiner } from "src/utils/stringUtils";
 
 const CUSTOMERS_STORAGE_KEY = endpoints.customers;
 
-export async function getCustomersController() {
-  try {
-    await delay();
-    const customers = readStorage(CUSTOMERS_STORAGE_KEY);
-    return customers;
-  } catch (err) {
-    console.log(err);
-
-    throw new Error(messages.getError);
-  }
-}
-
 export async function getEnrichedCustomersController({
   page = 1,
-  pageSize = defaultPageSize,
+  pageSize = DEFAULT_PAGE_SIZE,
   status = "all",
 }: {
   page?: number;
@@ -67,8 +56,8 @@ export async function getEnrichedCustomersController({
       startIndex + pageSize,
     );
 
-    // enrich only records actually returned
-    const data = enrichCustomers(paginatedCustomers);
+    // enrich only records to be returned
+    const data = enrichCustomersData(paginatedCustomers);
     return {
       data,
       pagination: {
@@ -78,6 +67,34 @@ export async function getEnrichedCustomersController({
         totalPages,
       },
     };
+  } catch {
+    throw new Error(messages.getError);
+  }
+}
+
+export async function searchCustomersController({
+  query,
+  limit,
+}: {
+  query: string;
+  limit?: number;
+}) {
+  try {
+    const customers = readStorage(CUSTOMERS_STORAGE_KEY);
+
+    const normalizedQuery = query.trim().toLowerCase();
+
+    if (!normalizedQuery) {
+      return [];
+    }
+
+    return customers
+      .filter((customer) => {
+        const fullName = nameJoiner(customer).toLowerCase();
+
+        return fullName.includes(normalizedQuery);
+      })
+      .slice(0, limit || customers.length);
   } catch {
     throw new Error(messages.getError);
   }

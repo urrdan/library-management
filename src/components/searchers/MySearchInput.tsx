@@ -1,12 +1,12 @@
 import { useEffect, useState, type JSX } from "react";
 import "../my-input/my-input.sass";
 import { BiSearch } from "react-icons/bi";
+import useDebounce from "src/utils/useDebounce";
 
 type props = {
   label?: string | undefined;
   error?: boolean;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  //searchResult: any[];
+  onSearch: (query: string) => void;
   resultStructure: () => JSX.Element;
   value: string;
   disabled?: boolean;
@@ -14,8 +14,7 @@ type props = {
 
 export default function MySearchInput({
   label,
-  onChange,
-  //searchResult,
+  onSearch,
   resultStructure,
   value,
   error,
@@ -29,9 +28,18 @@ export default function MySearchInput({
     setOpened(false);
   };
 
+  const debouncedValue = useDebounce(inputValue);
+
   useEffect(() => {
     setInputValue(value);
   }, [value]);
+
+  useEffect(() => {
+    if (debouncedValue && debouncedValue !== value) {
+      onSearch(debouncedValue);
+    }
+  }, [debouncedValue]);
+
   return (
     <div className="my-input">
       <div>
@@ -49,7 +57,6 @@ export default function MySearchInput({
           onChange={(e) => {
             setInputValue(e.target.value);
             setOpened(true);
-            onChange(e);
           }}
           disabled={disabled}
         ></input>

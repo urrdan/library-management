@@ -14,6 +14,7 @@ import type {
 import { CustomError } from "../utils/error";
 import dateUtil from "src/utils/dateUtil";
 import { DEFAULT_PAGE_SIZE } from "src/utils/constants";
+import { nameJoiner } from "src/utils/stringUtils";
 
 const STAFF_STORAGE_KEY = endpoints.staff;
 
@@ -56,6 +57,33 @@ export async function getStaffController({
       },
     };
   } catch (err) {
+    throw new Error(messages.getError);
+  }
+}
+
+export async function searchStaffController({
+  query,
+  limit,
+}: {
+  query: string;
+  limit?: number;
+}) {
+  try {
+    const staff = readStorage(STAFF_STORAGE_KEY);
+
+    const normalizedQuery = query.trim().toLowerCase();
+
+    if (!normalizedQuery) {
+      return [];
+    }
+
+    return staff
+      .filter((_staff) => {
+        const fullName = nameJoiner(_staff).toLowerCase();
+        return fullName.includes(normalizedQuery);
+      })
+      .slice(0, limit || staff.length);
+  } catch {
     throw new Error(messages.getError);
   }
 }

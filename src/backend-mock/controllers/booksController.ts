@@ -54,6 +54,30 @@ export async function getBooksController({
   }
 }
 
+export async function searchBooksController({
+  query,
+  limit,
+}: {
+  query: string;
+  limit?: number;
+}) {
+  try {
+    const books = readStorage(BOOKS_STORAGE_KEY);
+
+    const normalizedQuery = query.trim().toLowerCase();
+
+    if (!normalizedQuery) {
+      return [];
+    }
+
+    return books
+      .filter((book) => book.title.toLowerCase().includes(normalizedQuery))
+      .slice(0, limit || books.length);
+  } catch {
+    throw new Error(messages.getError);
+  }
+}
+
 export async function createBookController(
   book: Omit<Book, "id">,
 ): Promise<string> {
