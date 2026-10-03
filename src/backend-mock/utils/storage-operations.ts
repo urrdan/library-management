@@ -1,5 +1,4 @@
 import booksDB from "../database/booksDB";
-import rentalsDB from "../database/rentalsDB";
 import customersDB from "../database/customersDb";
 import staffDB from "../database/staffDB";
 import type { Customer } from "src/types/customerTypes";
@@ -7,6 +6,8 @@ import type { Staff } from "src/types/staffTypes";
 import { endpoints } from "./constants";
 import type { Rental } from "src/types/rentalTypes";
 import type { Book } from "src/types/bookTypes";
+import { resolveSeedRentalDates } from "./resolveRentalsSeed";
+import rentalsSeed from "../database/rentalsSeedDB";
 
 export type StorageSchema = {
   [endpoints.books]: Book[];
@@ -16,7 +17,7 @@ export type StorageSchema = {
 };
 const storageMap: StorageSchema = {
   [endpoints.books]: booksDB,
-  [endpoints.rentals]: rentalsDB,
+  [endpoints.rentals]: [],
   [endpoints.customers]: customersDB,
   [endpoints.staff]: staffDB,
 };
@@ -26,7 +27,10 @@ export function readStorage<K extends keyof StorageSchema>(key: K) {
 
   if (raw === null) {
     //initialize storage
-    const initialData = storageMap[key];
+    let initialData = storageMap[key];
+    if (key === endpoints.rentals) {
+      initialData = resolveSeedRentalDates(rentalsSeed) as StorageSchema[K];
+    }
     writeStorage(key, initialData);
     return initialData;
   } else if (!raw) return [] as StorageSchema[K];

@@ -1,7 +1,7 @@
 import type { Rental, RentalView } from "src/types/rentalTypes";
 import { endpoints } from "./constants";
 import { readStorage } from "./storage-operations";
-import { nameJoiner } from "src/utils/fullNameFormatter";
+import { nameJoiner } from "src/utils/stringUtils";
 import getRentalStatus from "./get-rental-status";
 export default function enrichRentals(rentals: Rental[]): RentalView[] {
   const books = readStorage(endpoints.books);
