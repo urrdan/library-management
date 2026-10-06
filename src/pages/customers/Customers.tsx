@@ -7,7 +7,7 @@ import MyButton from "src/components/my-button/MyButton";
 import { IoMdAdd } from "react-icons/io";
 import CustomersTable from "./CustomersTable";
 import CreateCustomerModal from "./customer-modals/CreateCustomerModal";
-import { defaultPageSize } from "src/utils/constants";
+import { DEFAULT_PAGE_SIZE } from "src/utils/constants";
 import TableFilter from "src/components/table-filter/TableFilters";
 
 export default function Customers() {
@@ -15,7 +15,7 @@ export default function Customers() {
 
   const [status, setStatus] = useState<CustomerStatusFilter>("all");
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(defaultPageSize);
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const [pagination, setPagination] = useState({
     page: page,
     pageSize: pageSize,

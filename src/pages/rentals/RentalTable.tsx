@@ -18,7 +18,7 @@ import ReturnRental from "./ReturnRental";
 import { CgUndo } from "react-icons/cg";
 import { MdUndo } from "react-icons/md";
 import { FiEdit } from "react-icons/fi";
-import { defaultPaginationOptions } from "src/utils/constants";
+import { DEFAULT_PAGINATION_OPTIONS } from "src/utils/constants";
 
 export const COLUMN_IDS = [
   "book",
@@ -46,6 +46,7 @@ type RentalTableProps = {
   paginationPerPage?: number;
   onChangePage?: (page: number) => void;
   onChangeRowsPerPage?: (rowsPerPage: number) => void;
+  paginationServer?: boolean;
 } & (
   | {
       hideColumns?: RentalColumnId[];
@@ -68,6 +69,7 @@ export default function RentalTable({
   paginationPerPage = 10,
   onChangePage,
   onChangeRowsPerPage,
+  paginationServer = true,
 }: RentalTableProps) {
   const [openEditRental, setOpenEditRental] = useState(false);
   const [openViewRental, setOpenViewRental] = useState(false);
@@ -117,9 +119,7 @@ export default function RentalTable({
 
     const currentStatus = statusMap[status];
 
-    return (
-      <StatusBadge title={currentStatus.title} status={currentStatus.status} />
-    );
+    return StatusBadge(currentStatus);
   };
 
   const columns: RentalTableColumn[] = [
@@ -275,9 +275,9 @@ export default function RentalTable({
         paginationTotalRows={paginationTotalRows}
         paginationPerPage={paginationPerPage}
         onChangePage={onChangePage}
-        paginationServer
+        paginationServer={paginationServer}
         onChangeRowsPerPage={onChangeRowsPerPage}
-        paginationRowsPerPageOptions={defaultPaginationOptions}
+        paginationRowsPerPageOptions={DEFAULT_PAGINATION_OPTIONS}
       />
 
       {openDelete && recordToBeDeleted && (

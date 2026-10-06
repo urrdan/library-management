@@ -18,8 +18,10 @@ import type { DashboardData } from "src/types/dashboardTypes";
 import { getDashboardAPI } from "src/api/dashboardApi";
 import Loading from "src/components/loading/Loading";
 import MyButton from "src/components/my-button/MyButton";
+import { useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
+  const navigate = useNavigate();
   const [dashboardData, setDashboardData] = useState<DashboardData>();
   const [loading, setLoading] = useState(true);
 
@@ -84,6 +86,7 @@ export default function Dashboard() {
                     link
                     icon={<MoveRight />}
                     iconRight
+                    onClick={() => navigate("/books?status=runningLow")}
                   />
                 </div>
 
@@ -123,6 +126,7 @@ export default function Dashboard() {
                     link
                     icon={<MoveRight />}
                     iconRight
+                    onClick={() => navigate("/rentals")}
                   />
                 </div>
                 <RentalTable
@@ -141,6 +145,7 @@ export default function Dashboard() {
                     link
                     icon={<MoveRight />}
                     iconRight
+                    onClick={() => navigate("/rentals?status=overdue")}
                   />
                 </div>
                 <RentalTable

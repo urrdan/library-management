@@ -115,41 +115,48 @@ export default function BooksTable({
   ];
 
   return (
-    <div className="my-table">
-      <DataTable
-        data={books}
-        columns={columns}
-        pagination
-        paginationPerPage={paginationPerPage}
-        paginationRowsPerPageOptions={DEFAULT_PAGINATION_OPTIONS}
-        paginationTotalRows={paginationTotalRows}
-        onChangePage={onChangePage}
-        onChangeRowsPerPage={onChangeRowsPerPage}
-        paginationServer
-        paginationResetDefaultPage={resetDefaultPage}
-        progressPending={loading}
-        progressComponent={<Loading />}
-      />
-      {openDelete && recordToBeDeleted && (
-        <ConfirmationModal
-          onClose={() => {
-            setOpenDelete(false);
-            setRecordToBeDeleted(null);
-          }}
-          onConfirm={() => onDeleteBook(recordToBeDeleted)}
-        />
+    <>
+      {loading ? (
+        <Loading />
+      ) : (
+        <div className="my-table">
+          <DataTable
+            data={books}
+            columns={columns}
+            pagination
+            paginationPerPage={paginationPerPage}
+            paginationRowsPerPageOptions={DEFAULT_PAGINATION_OPTIONS}
+            paginationTotalRows={paginationTotalRows}
+            onChangePage={onChangePage}
+            onChangeRowsPerPage={onChangeRowsPerPage}
+            paginationServer
+            paginationResetDefaultPage={resetDefaultPage}
+            progressPending={loading}
+            progressComponent={<Loading />}
+          />
+
+          {openDelete && recordToBeDeleted && (
+            <ConfirmationModal
+              onClose={() => {
+                setOpenDelete(false);
+                setRecordToBeDeleted(null);
+              }}
+              onConfirm={() => onDeleteBook(recordToBeDeleted)}
+            />
+          )}
+          {openEditModal && selectedBook && (
+            <BookForm
+              onClose={() => {
+                setOpenEditModal(false);
+                setSelectedBook(null);
+              }}
+              selectedBook={selectedBook}
+              isEditing
+              callBack={() => getBooks()}
+            />
+          )}
+        </div>
       )}
-      {openEditModal && selectedBook && (
-        <BookForm
-          onClose={() => {
-            setOpenEditModal(false);
-            setSelectedBook(null);
-          }}
-          selectedBook={selectedBook}
-          isEditing
-          callBack={() => getBooks()}
-        />
-      )}
-    </div>
+    </>
   );
 }

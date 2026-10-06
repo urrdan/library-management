@@ -194,6 +194,7 @@ export default function BookForm(props: BookFormProps) {
           />
           <MyInput
             label="Released Date"
+            type="date"
             value={stateData.releasedDate}
             onChange={(value) => onChange("releasedDate", value)}
             error={errorData.releasedDate}

@@ -8,18 +8,20 @@ import { delay } from "../utils/delay";
 import { CustomError } from "../utils/error";
 import type {
   AdminRentalEditable,
+  Rental,
   RentalCreate,
   RentalStatusFilter,
 } from "src/types/rentalTypes";
 import type { Book } from "src/pages/books/bookTypes";
 import enrichRentals from "../utils/rental-view";
 import getRentalStatus from "../utils/get-rental-status";
+import { DEFAULT_PAGE_SIZE } from "src/utils/constants";
 
 const RENTALS_STORAGE_KEY = endpoints.rentals;
 const BOOK_STORAGE_KEY = endpoints.books;
 export async function getEnhancedRentalsController({
   page = 1,
-  pageSize = 10,
+  pageSize = DEFAULT_PAGE_SIZE,
   status = "all",
 }: {
   page?: number;
@@ -84,15 +86,45 @@ export async function getRentalsController() {
   }
 }
 
-export async function getCustomerRentalsController(customerId: string) {
+export async function getCustomerRentalsController(
+  customerId: string,
+  status: RentalStatusFilter = "all",
+) {
   try {
     await delay();
     const rentals = readStorage(RENTALS_STORAGE_KEY);
     const customerRentals = rentals.filter(
       (rental) => rental.customerId === customerId,
     );
-    const enrichedRentals = enrichRentals(customerRentals);
-    return enrichedRentals;
+
+    const counts = {
+      all: customerRentals.length,
+      returned: 0,
+      overdue: 0,
+      active: 0,
+    };
+    const filteredRentals: Rental[] = [];
+    customerRentals.forEach((rental) => {
+      const rentalStatus = getRentalStatus(rental);
+
+      if (rentalStatus === "active") {
+        counts.active++;
+      } else if (rentalStatus === "overdue") {
+        counts.overdue++;
+      } else if (rentalStatus === "returned") {
+        counts.returned++;
+      }
+      if (status === "all" || rentalStatus === status) {
+        filteredRentals.push(rental);
+      }
+    });
+
+    const data = enrichRentals(filteredRentals);
+
+    return {
+      data,
+      counts,
+    };
   } catch {
     throw new Error(messages.getError);
   }

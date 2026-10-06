@@ -57,7 +57,7 @@ export default function CustomerRentalHistory({ customer, onClose }: Props) {
           <MyModalHead>
             <h4>Rental History</h4>
 
-            <MdClose className="link-like" onClick={onClose} />
+            <MdClose className="link-like text-2xl" onClick={onClose} />
           </MyModalHead>
 
           <MyModalBody>

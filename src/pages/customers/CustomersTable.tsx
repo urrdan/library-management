@@ -10,19 +10,23 @@ import apiWithToast from "src/api/toastifiedApi";
 import { useState } from "react";
 import ConfirmationModal from "src/components/my-modal/ConfirmationModal";
 import { BiLinkExternal } from "react-icons/bi";
-import { defaultPaginationOptions } from "src/utils/constants";
+import {
+  DEFAULT_PAGE_SIZE,
+  DEFAULT_PAGINATION_OPTIONS,
+} from "src/utils/constants";
 import TableActionMenu from "src/components/table-action-menu/TableActionMenu";
 import { FiEdit } from "react-icons/fi";
 import CustomerRentalHistory from "./customer-modals/rental-history/CustomerRentalHistory";
 import type { StatusBadgeType } from "src/components/status-badge/StatusBadge";
 import StatusBadge from "src/components/status-badge/StatusBadge";
 import EditCustomerModal from "./customer-modals/EditCustomerModal";
+import { UserRoundCheck, UserRoundX } from "lucide-react";
 
 export default function CustomersTable({
   customers,
   getCustomers,
   paginationTotalRows,
-  paginationPerPage = 10,
+  paginationPerPage = DEFAULT_PAGE_SIZE,
   onChangePage,
   onChangeRowsPerPage,
   resetDefaultPage,
@@ -121,7 +125,7 @@ export default function CustomersTable({
       grow: 2,
     },
     {
-      name: "Rentals",
+      name: "Current",
       selector: (row) => row.activeRental,
       cell: (row) => <div className="info-color bold">{row.activeRental}</div>,
     },
@@ -142,26 +146,27 @@ export default function CustomersTable({
                 setOpenViewModal(true);
               }}
             />
-            <RiDeleteBin2Line
-              className="link-like"
+            <FiEdit
+              className="link-like text-[19px]"
               onClick={() => {
-                setRecordToBeDeleted(row);
-                setOpenDelete(true);
+                setSelectedCustomer(row);
+                setOpenEditModal(true);
               }}
             />
+
             <TableActionMenu
               items={[
                 {
-                  label: "Edit",
-                  icon: <FiEdit />,
+                  label: "Delete",
+                  icon: <RiDeleteBin2Line />,
                   onClick: () => {
-                    setSelectedCustomer(row);
-                    setOpenEditModal(true);
+                    setRecordToBeDeleted(row);
+                    setOpenDelete(true);
                   },
                 },
                 row.status === "active" && {
                   label: "Suspend",
-                  icon: <FiEdit />,
+                  icon: <UserRoundX />,
                   onClick: () => {
                     setSelectedCustomer(row);
                     setOpenSuspend(true);
@@ -169,7 +174,7 @@ export default function CustomersTable({
                 },
                 row.status === "suspended" && {
                   label: "Activate",
-                  icon: <FiEdit />,
+                  icon: <UserRoundCheck />,
                   onClick: () => {
                     setSelectedCustomer(row);
                     setOpenActivate(true);
@@ -180,7 +185,7 @@ export default function CustomersTable({
           </div>
         );
       },
-      sortable: true,
+      right: true,
     },
   ];
 
@@ -195,7 +200,7 @@ export default function CustomersTable({
         onChangePage={onChangePage}
         paginationServer
         onChangeRowsPerPage={onChangeRowsPerPage}
-        paginationRowsPerPageOptions={defaultPaginationOptions}
+        paginationRowsPerPageOptions={DEFAULT_PAGINATION_OPTIONS}
         paginationResetDefaultPage={resetDefaultPage}
       />
       {openDelete && recordToBeDeleted && (

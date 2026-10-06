@@ -8,19 +8,23 @@ import RentalTable from "./RentalTable";
 import RentalForm from "./RentalForm";
 import { getRentalsAPI } from "src/api/rentalApi";
 import type { RentalStatusFilter, RentalView } from "src/types/rentalTypes";
-import RentalTableFilter from "./rental-filter/RentalFilter";
-import { defaultPageSize } from "src/utils/constants";
+import { DEFAULT_PAGE_SIZE } from "src/utils/constants";
+import TableFilter from "src/components/table-filter/TableFilters";
+import { useSearchParams } from "react-router-dom";
 
 export default function Rentals() {
+  const [searchParams] = useSearchParams();
+  const initialStatus =
+    (searchParams.get("status") as RentalStatusFilter) || "all";
   const [rentalData, setRentalData] = useState<RentalView[]>([]);
   const [loading, setLoading] = useState(true);
 
   const [openNewRental, setOpenNewRental] = useState(false);
 
-  const [status, setStatus] = useState<RentalStatusFilter>("all");
+  const [status, setStatus] = useState<RentalStatusFilter>(initialStatus);
 
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(defaultPageSize);
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const [pagination, setPagination] = useState({
     page: page,
     pageSize: pageSize,
@@ -61,7 +65,16 @@ export default function Rentals() {
       ) : (
         <>
           <div className="mb-4 flex justify-between items-center">
-            <RentalTableFilter value={status} onChange={onStatusChange} />
+            <TableFilter
+              value={status}
+              onChange={onStatusChange}
+              filters={[
+                { label: "All", value: "all" },
+                { label: "Active", value: "active" },
+                { label: "Overdue", value: "overdue" },
+                { label: "Returned", value: "returned" },
+              ]}
+            />
 
             <MyButton
               icon={<IoMdAdd />}
@@ -78,11 +91,9 @@ export default function Rentals() {
             paginationTotalRows={pagination.totalRecords}
             paginationPerPage={pageSize}
             onChangePage={(page) => {
-              console.log(page);
               setPage(page);
             }}
             onChangeRowsPerPage={(newPageSize) => {
-              console.log(newPageSize);
               setPageSize(newPageSize);
               setPage(1);
             }}

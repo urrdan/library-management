@@ -5,12 +5,12 @@ import apiWithToast from "src/api/toastifiedApi";
 import MyButton from "src/components/my-button/MyButton";
 import BookSearcher from "src/components/searchers/BookSearcher";
 import { MyModalBody, MyModalHead } from "src/components/my-modal/MyModal";
-import CustomerSearcher from "src/components/searchers/CustomersSearcher";
+import CustomerSearcher from "src/components/searchers/CustomerSearcher";
 import StaffSearcher from "src/components/searchers/StaffSearcher";
 import MyInput from "src/components/my-input/MyInput";
 import { createRentalAPI, updateRentalAPI } from "src/api/rentalApi";
 import type { RentalCreate, RentalView } from "src/types/rentalTypes";
-import { nameJoiner } from "src/utils/fullNameFormatter";
+import { nameJoiner } from "src/utils/stringUtils";
 
 type CreatingProp = {
   isEditing: false;
