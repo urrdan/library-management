@@ -22,6 +22,15 @@ export type RentalView = Rental & {
   status: RentalStatus;
 };
 
+export type SeedRental = Omit<
+  Rental,
+  "rentedDate" | "dueDate" | "returnedDate"
+> & {
+  rentedDate: number;
+  dueDate: number;
+  returnedDate: number | null;
+};
+
 export type AdminRentalEditable = RentalCreate &
   Partial<Pick<Rental, "returnedDate">>;
 

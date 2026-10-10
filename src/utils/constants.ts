@@ -1,1 +1,3 @@
-export const mainPagination = [5, 10, 50, 100];
+export const DEFAULT_PAGINATION_OPTIONS = [5, 10, 50, 100];
+export const DEFAULT_PAGE_SIZE = 10;
+export const LOW_BOOK_STOCK_THRESHOLD = 2;

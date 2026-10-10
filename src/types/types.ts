@@ -1,5 +1,3 @@
-import type { endpoints } from "src/utils/constants";
-
 //books
 export type Book = {
   id: string;
@@ -13,7 +11,6 @@ export type Book = {
   coverImageUrl?: string;
   releasedDate: string;
 };
-export type EditableBook = Omit<Book, "id">;
 
 //rental
 export type Rental = {
@@ -26,10 +23,4 @@ export type Rental = {
   staffName: string;
   rentedDate: string;
   returnDate: string;
-};
-
-//endpoints
-export type SuccessResponse<T> = {
-  data: T;
-  message: string | null;
 };
