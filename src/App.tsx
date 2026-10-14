@@ -1,9 +1,8 @@
 import { HashRouter } from "react-router-dom";
-import "./App.css";
 import { AppContext } from "./services/AppContext";
 
 import { ToastContainer } from "react-toastify";
-import "src/styles/theme.sass";
+import "src/styles/index.sass";
 
 import Layout from "./layout/Layout";
 

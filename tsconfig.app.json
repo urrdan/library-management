@@ -7,7 +7,6 @@
     "module": "ESNext",
     "skipLibCheck": true,
 
-    "baseUrl": ".",
     "paths": {
       "src/*": ["./src/*"]
     },
@@ -28,5 +27,5 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src"]
+  "include": ["src", "src/pages/customers/.tsx"]
 }

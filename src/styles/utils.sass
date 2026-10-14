@@ -1,0 +1,48 @@
+.table-actions
+    display: flex
+    flex-direction: row
+    justify-content: space-around
+    align-items: center
+    gap: 10px
+    >*
+        font-size: 20px
+    
+.link-like:hover 
+  opacity: 0.7
+  cursor: pointer
+  color: var(--color-button-bg)
+
+.danger-color
+  color: var(--color-status-danger)
+.info-color
+  color: var(--color-status-info)
+
+.bold
+  font-weight: bold
+h5
+  font-size: 16px
+  font-weight: 600
+
+.rdt_Table
+  overflow: auto
+  .rdt_TableHeadRow
+    color: rgb(45, 45, 45)
+    text-transform: uppercase
+    font-weight: 700
+    min-height: 40px
+    height: 40px
+    background: var(--color-surface-table-head)
+  .rdt_TableRow
+    &:nth-child(even)
+      background: var(--color-surface-table-striped)
+.my-table
+  box-shadow: 0 0 4px var(--color-border-shadow)
+
+  .rdt_TableCell
+    white-space: normal !important
+
+.Toastify__toast-container
+  z-index: var(--z-index-toast)
+  
+
+  

@@ -6,4 +6,8 @@
         --color-#{$name}: #{$value}
     @each $name, $value in token.$spacing
         --spacing-#{$name}: #{$value}
+    @each $name, $value in token.$typography
+        --font-#{$name}: #{$value}
+    @each $name, $value in token.$z-index
+        --z-index-#{$name}: #{$value}
          
