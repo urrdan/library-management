@@ -29,10 +29,9 @@ export default function CustomerRentalHistory({ customer, onClose }: Props) {
   const [filter, setFilter] = useState<RentalStatusFilter>("all");
   const [initialLoading, setInitialLoading] = useState(true);
   const [tableLoading, setTableLoading] = useState(false);
-
-  useEffect(() => {
+  const getCustomerRentals = () => {
     setTableLoading(true);
-    getCustomerRentalsAPI(customer.id, filter)
+     getCustomerRentalsAPI(customer.id, filter)
       .then((res) => {
         const { data, counts } = res.data || {};
 
@@ -43,6 +42,11 @@ export default function CustomerRentalHistory({ customer, onClose }: Props) {
         initialLoading && setInitialLoading(false);
         setTableLoading(false);
       });
+  };
+
+  useEffect(() => {
+    getCustomerRentals();
+   
   }, [customer.id, filter]);
 
   return (
@@ -126,16 +130,15 @@ export default function CustomerRentalHistory({ customer, onClose }: Props) {
               </div>
             </div>
             <div className="model-table-content">
-              {tableLoading ? (
-                <Loading />
-              ) : (
+              
                 <RentalTable
                   rentals={rentals}
-                  getRentals={() => {}}
+                  getRentals={getCustomerRentals}
                   hideColumns={["customer", "staff", "overdueDays"]}
                   paginationServer={false}
+                  tableLoading={tableLoading}
                 />
-              )}
+              
             </div>
           </MyModalBody>
         </>

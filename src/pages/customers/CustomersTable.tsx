@@ -21,6 +21,7 @@ import type { StatusBadgeType } from "src/components/status-badge/StatusBadge";
 import StatusBadge from "src/components/status-badge/StatusBadge";
 import EditCustomerModal from "./customer-modals/EditCustomerModal";
 import { UserRoundCheck, UserRoundX } from "lucide-react";
+import Loading from "src/components/loading/Loading";
 
 export default function CustomersTable({
   customers,
@@ -30,6 +31,7 @@ export default function CustomersTable({
   onChangePage,
   onChangeRowsPerPage,
   resetDefaultPage,
+  tableLoading,
 }: {
   customers: Customer[];
   getCustomers: () => void;
@@ -38,6 +40,7 @@ export default function CustomersTable({
   onChangePage?: (page: number) => void;
   onChangeRowsPerPage?: (rowsPerPage: number) => void;
   resetDefaultPage?: boolean;
+  tableLoading?: boolean;
 }) {
   const [openEditModal, setOpenEditModal] = useState(false);
   const [openViewModal, setOpenViewModal] = useState(false);
@@ -58,7 +61,7 @@ export default function CustomersTable({
         setSelectedCustomer(null);
         setOpenSuspend(false);
       })
-      .catch((res) => console.log(res.message));
+      
   };
 
   const onActivateCustomer = (customer: Customer) => {
@@ -68,7 +71,7 @@ export default function CustomersTable({
         setSelectedCustomer(null);
         setOpenActivate(false);
       })
-      .catch((res) => console.log(res.message));
+      
   };
   const onDeleteCustomer = (customer: Customer) => {
     apiWithToast(deleteCustomerAPI(customer.id))
@@ -77,7 +80,7 @@ export default function CustomersTable({
         setRecordToBeDeleted(null);
         setOpenDelete(false);
       })
-      .catch((res) => console.log(res.message));
+      
   };
   const setupStatus = (row: Customer) => {
     const status = row.status;
@@ -202,6 +205,8 @@ export default function CustomersTable({
         onChangeRowsPerPage={onChangeRowsPerPage}
         paginationRowsPerPageOptions={DEFAULT_PAGINATION_OPTIONS}
         paginationResetDefaultPage={resetDefaultPage}
+        progressPending={tableLoading}
+        progressComponent={<Loading />}
       />
       {openDelete && recordToBeDeleted && (
         <ConfirmationModal

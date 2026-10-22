@@ -10,6 +10,7 @@ import type { Book, BookStatusFilter } from "src/types/bookTypes";
 import TableFilter from "src/components/table-filter/TableFilters";
 import { useSearchParams } from "react-router-dom";
 import { DEFAULT_PAGE_SIZE } from "src/utils/constants";
+import Loading from "src/components/loading/Loading";
 
 export default function Books() {
   const [searchParams] = useSearchParams();
@@ -18,7 +19,8 @@ export default function Books() {
   const [status, setStatus] = useState<BookStatusFilter>(initialStatus);
   const [books, setBooks] = useState<Book[]>([]);
   const [openModal, setOpenModal] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [tableLoading, setTableLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [resetPaginationToggle, setResetPaginationToggle] = useState(false);
 
   const [page, setPage] = useState(1);
@@ -35,13 +37,16 @@ export default function Books() {
   };
 
   function getBooks() {
-    setLoading(true);
+    setTableLoading(true);
     apiWithToast(getBooksAPI({ page, pageSize, status }))
       .then((res) => {
         res.pagination && setPagination(res.pagination);
         setBooks(res.data);
       })
-      .finally(() => setLoading(false));
+      .finally(() => {
+        setInitialLoading(false);
+        setTableLoading(false);
+      });
   }
 
   useEffect(() => {
@@ -49,6 +54,12 @@ export default function Books() {
   }, [status, page, pageSize]);
 
   return (
+    <>
+      {initialLoading ? (
+        <Loading
+         />
+      ) : (
+        <>
     <div style={{ height: 300, width: "100%" }}>
       <div className="mb-4 flex justify-between ">
         <TableFilter<BookStatusFilter>
@@ -85,7 +96,7 @@ export default function Books() {
           resetPagination();
         }}
         resetDefaultPage={resetPaginationToggle}
-        loading={loading}
+        loading={tableLoading}
       />
 
       {openModal && (
@@ -98,5 +109,8 @@ export default function Books() {
         />
       )}
     </div>
+    </>
+      )}
+    </>
   );
 }

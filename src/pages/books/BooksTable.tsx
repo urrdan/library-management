@@ -42,6 +42,7 @@ export default function BooksTable({
     apiWithToast(deleteBookAPI(book.id))
       .then(() => {
         getBooks();
+        setOpenDelete(false);
       })
       .catch((res) => console.log(res.message));
   };
@@ -115,10 +116,7 @@ export default function BooksTable({
   ];
 
   return (
-    <>
-      {loading ? (
-        <Loading />
-      ) : (
+      
         <div className="my-table">
           <DataTable
             data={books}
@@ -156,7 +154,7 @@ export default function BooksTable({
             />
           )}
         </div>
-      )}
-    </>
+  
+   
   );
 }

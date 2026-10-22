@@ -17,7 +17,8 @@ export default function Rentals() {
   const initialStatus =
     (searchParams.get("status") as RentalStatusFilter) || "all";
   const [rentalData, setRentalData] = useState<RentalView[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [tableLoading, setTableLoading] = useState(true);
 
   const [openNewRental, setOpenNewRental] = useState(false);
 
@@ -32,7 +33,14 @@ export default function Rentals() {
     totalPages: 0,
   });
 
+  const [resetPaginationToggle, setResetPaginationToggle] = useState(false);
+
+  const resetPagination = () => {
+    setPage(1);
+    setResetPaginationToggle((prev) => !prev);
+  };
   function getRentals() {
+    setTableLoading(true);
     apiWithToast(
       getRentalsAPI({
         page,
@@ -42,17 +50,16 @@ export default function Rentals() {
     )
       .then((res) => {
         setRentalData(res.data);
-        setLoading(false);
         if (res.pagination) {
           setPagination(res.pagination);
         }
       })
-      .catch((err) => console.log(err));
+
+      .finally(() => {
+        setInitialLoading(false);
+        setTableLoading(false);
+      });
   }
-  const onStatusChange = (newStatus: RentalStatusFilter) => {
-    setStatus(newStatus);
-    setPage(1);
-  };
 
   useEffect(() => {
     getRentals();
@@ -60,14 +67,17 @@ export default function Rentals() {
 
   return (
     <div>
-      {loading ? (
+      {initialLoading ? (
         <Loading />
       ) : (
         <>
           <div className="mb-4 flex justify-between items-center">
             <TableFilter
               value={status}
-              onChange={onStatusChange}
+              onChange={(newStatus: RentalStatusFilter) => {
+                setStatus(newStatus);
+                resetPagination();
+              }}
               filters={[
                 { label: "All", value: "all" },
                 { label: "Active", value: "active" },
@@ -90,12 +100,14 @@ export default function Rentals() {
             hideColumns={["overdueDays"]}
             paginationTotalRows={pagination.totalRecords}
             paginationPerPage={pageSize}
+            tableLoading={tableLoading}
+            resetDefaultPage={resetPaginationToggle}
             onChangePage={(page) => {
               setPage(page);
             }}
             onChangeRowsPerPage={(newPageSize) => {
+              resetPagination();
               setPageSize(newPageSize);
-              setPage(1);
             }}
           />
           {openNewRental && (

@@ -34,7 +34,7 @@ export default function ReturnRental({
         <div>
           <h4> Return Rental</h4>
         </div>
-        <div className="flex">
+        <div className="flex ml-9">
           <MyButton title="Save" onClick={onReturn} />
           <MdClose
             className="ml-2 link-like text-3xl text-gray-500"

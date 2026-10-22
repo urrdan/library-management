@@ -19,6 +19,7 @@ import { CgUndo } from "react-icons/cg";
 import { MdUndo } from "react-icons/md";
 import { FiEdit } from "react-icons/fi";
 import { DEFAULT_PAGINATION_OPTIONS } from "src/utils/constants";
+import Loading from "src/components/loading/Loading";
 
 export const COLUMN_IDS = [
   "book",
@@ -47,6 +48,8 @@ type RentalTableProps = {
   onChangePage?: (page: number) => void;
   onChangeRowsPerPage?: (rowsPerPage: number) => void;
   paginationServer?: boolean;
+  tableLoading?: boolean;
+  resetDefaultPage?: boolean;
 } & (
   | {
       hideColumns?: RentalColumnId[];
@@ -70,21 +73,20 @@ export default function RentalTable({
   onChangePage,
   onChangeRowsPerPage,
   paginationServer = true,
+  tableLoading,
+  resetDefaultPage,
 }: RentalTableProps) {
   const [openEditRental, setOpenEditRental] = useState(false);
   const [openViewRental, setOpenViewRental] = useState(false);
-  const [editingData, setEditingData] = useState<RentalView | null>(null);
+  const [selectedRecord, setSelectedRecord] = useState<RentalView | null>(null);
   const [openDelete, setOpenDelete] = useState(false);
   const [openUndoReturn, setOpeningUndoReturnModal] = useState(false);
-  const [recordToBeDeleted, setRecordToBeDeleted] = useState<RentalView | null>(
-    null,
-  );
+  
   const [openingReturnModal, setOpeningReturnModal] = useState(false);
 
   const onDeleting = (record: RentalView) => {
     apiWithToast(deleteRentalAPI(record.id)).then(() => {
       getRentals();
-      setRecordToBeDeleted(null);
       setOpenDelete(false);
     });
   };
@@ -92,7 +94,7 @@ export default function RentalTable({
   const onUndoReturn = (record: RentalView) => {
     apiWithToast(undoReturnRentalAPI(record.id)).then(() => {
       getRentals();
-      setRecordToBeDeleted(null);
+      
       setOpeningUndoReturnModal(false);
     });
   };
@@ -206,7 +208,7 @@ export default function RentalTable({
             <BiLinkExternal
               className="link-like"
               onClick={() => {
-                setEditingData(record);
+                setSelectedRecord(record);
                 setOpenViewRental(true);
               }}
             />
@@ -218,7 +220,7 @@ export default function RentalTable({
                   icon: <MdUndo />,
                   onClick: () => {
                     setOpeningReturnModal(true);
-                    setEditingData(record);
+                    setSelectedRecord(record);
                   },
                 },
                 status === "returned" && {
@@ -226,14 +228,14 @@ export default function RentalTable({
                   icon: <CgUndo />,
                   onClick: () => {
                     setOpeningUndoReturnModal(true);
-                    setEditingData(record);
+                    setSelectedRecord(record);
                   },
                 },
                 {
                   label: "Admin Edit",
                   icon: <FiEdit />,
                   onClick: () => {
-                    setEditingData(record);
+                    setSelectedRecord(record);
                     setOpenEditRental(true);
                   },
                 },
@@ -241,7 +243,7 @@ export default function RentalTable({
                   label: "Admin Delete",
                   icon: <RiDeleteBin2Line />,
                   onClick: () => {
-                    setRecordToBeDeleted(record);
+                    setSelectedRecord(record);
                     setOpenDelete(true);
                   },
                 },
@@ -278,29 +280,32 @@ export default function RentalTable({
         paginationServer={paginationServer}
         onChangeRowsPerPage={onChangeRowsPerPage}
         paginationRowsPerPageOptions={DEFAULT_PAGINATION_OPTIONS}
+        paginationResetDefaultPage={resetDefaultPage}
+        progressPending={tableLoading}
+        progressComponent={<Loading />}
       />
 
-      {openDelete && recordToBeDeleted && (
+      {openDelete && selectedRecord && (
         <ConfirmationModal
           onClose={() => {
             setOpenDelete(false);
-            setRecordToBeDeleted(null);
+            
           }}
-          onConfirm={() => onDeleting(recordToBeDeleted)}
+          onConfirm={() => onDeleting(selectedRecord)}
         />
       )}
 
-      {openUndoReturn && recordToBeDeleted && (
+      {openUndoReturn && selectedRecord && (
         <ConfirmationModal
           onClose={() => {
             setOpeningUndoReturnModal(false);
-            setRecordToBeDeleted(null);
+            
           }}
-          onConfirm={() => onUndoReturn(recordToBeDeleted)}
+          onConfirm={() => onUndoReturn(selectedRecord)}
         />
       )}
 
-      {openViewRental && editingData && (
+      {openViewRental && selectedRecord && (
         <MyModal
           onClose={() => {
             setOpenViewRental(false);
@@ -308,17 +313,17 @@ export default function RentalTable({
         >
           <RentalForm
             isViewing
-            editingRecord={editingData}
+            editingRecord={selectedRecord}
             getRentals={getRentals}
             onClose={() => {
               setOpenViewRental(false);
-              setEditingData(null);
+              
             }}
           />
         </MyModal>
       )}
 
-      {openEditRental && editingData && (
+      {openEditRental && selectedRecord && (
         <MyModal
           onClose={() => {
             setOpenEditRental(false);
@@ -326,30 +331,29 @@ export default function RentalTable({
         >
           <RentalForm
             isEditing
-            editingRecord={editingData}
-            rentalId={editingData.id}
+            editingRecord={selectedRecord}
+            rentalId={selectedRecord.id}
             getRentals={getRentals}
             onClose={() => {
               setOpenEditRental(false);
-              setEditingData(null);
             }}
           />
         </MyModal>
       )}
 
-      {openingReturnModal && editingData && (
+      {openingReturnModal && selectedRecord && (
         <MyModal
           onClose={() => {
             setOpeningReturnModal(false);
-            setEditingData(null);
+            
           }}
         >
           <ReturnRental
             onClose={() => {
               setOpeningReturnModal(false);
-              setEditingData(null);
+              
             }}
-            rentalId={editingData.id}
+            rentalId={selectedRecord.id}
             getRentals={getRentals}
           />
         </MyModal>

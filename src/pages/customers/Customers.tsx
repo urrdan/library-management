@@ -24,7 +24,8 @@ export default function Customers() {
   });
 
   const [openModal, setOpenModal] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [tableLoading, setTableLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(true);
 
   const [resetPaginationToggle, setResetPaginationToggle] = useState(false);
 
@@ -34,6 +35,7 @@ export default function Customers() {
   };
 
   function getCustomers() {
+    setTableLoading(true);
     apiWithToast(getCustomersAPI({ page, pageSize, status }))
       .then((res) => {
         let data = res.data;
@@ -43,7 +45,10 @@ export default function Customers() {
           setPagination(res.pagination);
         }
       })
-      .finally(() => setLoading(false));
+      .finally(() => {
+        setInitialLoading(false);
+        setTableLoading(false);
+      });
   }
 
   useEffect(() => {
@@ -51,7 +56,7 @@ export default function Customers() {
   }, [page, pageSize, status]);
   return (
     <>
-      {loading ? (
+      {initialLoading ? (
         <Loading />
       ) : (
         <>
@@ -81,6 +86,7 @@ export default function Customers() {
             getCustomers={getCustomers}
             paginationTotalRows={pagination.totalRecords}
             paginationPerPage={pageSize}
+            tableLoading={tableLoading}
             onChangePage={(page) => {
               setPage(page);
             }}
